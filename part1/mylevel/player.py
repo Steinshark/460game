@@ -63,9 +63,11 @@ class Player:
         update = False
         update_movement = False
         self.dx = 0.0
+        self.dy = (3/2) * math.pi
         self.init_jump = False
 
-        self.update_position_airborne()
+
+        #self.update_position_airborne()
 
         # Check all key presses
         # D
@@ -102,28 +104,42 @@ class Player:
                 self.dx *= 3
         # W
         if 119 in keyTracking.keys():
-            if self.will_collide_v(config) != False:
-                self.jump_x = (1 / 2) * math.pi
-                self.init_jump = True
-                self.update_position_airborne()
+  #          if self.will_collide_v(config) != False:
+            self.jump_x = (1 / 2) * math.pi
+            self.init_jump = True
+            print("on")
+            self.airborne = True
+
+        if self.airborne:
+            self.update_position_airborne()
 
 
 
-        vert_collision = self.will_collide_v(config)
-        hori_collision = self.will_collide_h(config)
+        #vert_collision = self.will_collide_v(config)
+        #hori_collision = self.will_collide_h(config)
 
-        if vert_collision != False:
-             direction, point, hitbox = vert_collision
+ #       if vert_collision != False:
+  #          self.update_position_airborne()
+  #           direction, point, hitbox = vert_collision
 
-             if direction == 'upper':
-                 self.jump_x = math.pi + .5
-                 self.update_position_airborne()
-                 vert_collision = self.will_collide_v(config)
+ #            if direction == 'upper':
+#                 self.jump_x = math.pi + .5
+#                 vert_collision = self.will_collide_v(config)
+#
+#
+#             elif direction == 'lower':
+#                 self.jump_x = (3 / 2) * math.pi
+#                 point = vert_collision[1]
+#                 hitbox = vert_collision[2]
+#                 point_y = point['y']
+#                 hb_y = hitbox['ur']['y']
+#                 self.dy = (hb_y - point_y) - .001
+#                 self.jump_x = (3/2) * math.pi
 
 
-             else:
-                 self.jump_x = (3 / 2) * math.pi
-                 vert_collision = self.will_collide_v(config)
+        if self.airborne:
+            self.playerSprite.y += self.dy
+        self.playerSprite.x += self.dx
 
 
 
@@ -134,11 +150,18 @@ class Player:
         if update:
             self.changeSprite()
 
-        if vert_collision == False or self.init_jump:
-            self.playerSprite.y += self.dy
+        # update normally if there is no collision
+        #if vert_collision == False or self.init_jump:
+        #    self.playerSprite.y += self.dy
 
-        if hori_collision == False:
-            self.playerSprite.x += self.dx
+        # update as close to surface if there would
+        # otherwise be a collision
+        #else:
+        #    pass
+
+
+ #       if hori_collision == False:
+  #          self.playerSprite.x += self.dx
 
         if not update_movement:
             self.mode = 'Idle'
@@ -160,17 +183,30 @@ class Player:
 
         self.dy = 17*math.sin(self.jump_x)
 
+        if ((res := self.will_collide_v(config)) != False) and not self.init_jump:
+            print("COllision detected")
+            if res[0] == 'upper':
+                self.dy = res[2]['ll']['y'] - res[1]['y'] - .01
+                self.jump_x = math.pi + .5
+            else:
+                self.dy = res[2]['ul']['y'] - res[1]['y'] - .01
+                self.jump_x = (3/2) * math.pi
+                print("off")
+                self.airborne = False
+
+
+
     def check_collision_vert(self,config):
         level,width,height = (config.level,config.width,config.height)
         delta_x = 0
         delta_y = 0
 
         # Player collision parametrics
-        x_pos = (self.playerSprite.x + 0*self.playerSprite.width/2) + delta_x
+        x_pos = self.playerSprite.x + delta_x
         y_pos = self.playerSprite.y + delta_y
         player_line = {'bot' : {'x' : x_pos,'y' : y_pos},\
-                       'top' : {'x' : x_pos,'y' : y_pos + 0.75 * self.playerSprite.height}}
-
+                       'top' : {'x' : x_pos,'y' : y_pos + ( self.playerSprite.height)}}
+                       #+ 0.75 * self.playerSprite.height
         for point in player_line.values():
             color = (0,0,0)
             if point == player_line['top']:
@@ -196,12 +232,6 @@ class Player:
                     i += 1
                 # Check hit from above
                 if self.within(player_line['top'],hitbox):
-
-                #if  player_line['top']['x'] >= hitbox['ll']['x'] and \
-                #    player_line['top']['x'] <= hitbox['lr']['x'] and \
-                #    player_line['top']['y'] <= hitbox['ul']['y'] and \
-                #    player_line['top']['y'] >= hitbox['ll']['y']:
-
                     return ("upper", player_line['top'], hitbox)
 
                 if self.within(player_line['bot'], hitbox):
