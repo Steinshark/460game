@@ -3,7 +3,6 @@
 # Important Libraries
 import pyglet
 import time, sys, importlib
-
 # Our world that we will draw via pyglet
 class Game:
 
@@ -92,7 +91,6 @@ if __name__ == '__main__':
 
     print('Loading Level...')
     level =  getattr(importlib.import_module(levelName), 'level')
-
     print('Starting Game...')
     myGame = Game(800, 600, "SI460 Game", level)
     pyglet.app.run()

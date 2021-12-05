@@ -5,7 +5,8 @@ import pyglet
 from pprint import pp
 # Our own Game Libraries
 import sprites, config
-
+from player import Player
+from enemy import Enemy
 # SI460 Level Definition
 class Level:
     def __init__(self, sprites, hero, enemies=[]):
@@ -22,21 +23,6 @@ class Level:
         self.sprites = sprites
         self.hero    = hero
         self.enemies = enemies
-
-        # Music in the Background
-        # player can hold multiple tracks,
-        # currently it only loops the background music
-        self.player = pyglet.media.Player()
-
-        self.background_music = pyglet.media.load('mylevel/music/1.wav')
-        self.player.queue(self.background_music)
-
-        # start playing the music
-        self.player.loop = True
-        self.player.play()
-
-
-
 
     # Here is a complete drawBoard function which will draw the terrain.
     # Lab Part 1 - Draw the board here
@@ -69,7 +55,7 @@ class Level:
             enemy.draw(t)
 
         # Draw the hero.
-        self.hero.draw(t, keyTracking)
+        self.hero.draw(t, keyTracking,config,enemies)
 
 # Load all game sprites
 print('Loading Sprites...')
@@ -77,7 +63,6 @@ gameSprites = sprites.loadAllImages(config.spritespath)
 
 # Load in the hero
 print('Loading the Hero...')
-from player import Player
 hero = Player(gameSprites,
               sprites.buildSprite,
               "hero", "Idle", "Right",
@@ -89,7 +74,14 @@ hero = Player(gameSprites,
 
 # Load in the Enemies
 print('Loading the Enemies...')
-enemies = []
+enemies = [Enemy(   gameSprites,\
+                    sprites.buildSprite,"enemy-1", "Idle","Right",\
+                    config.playerSpriteSpeed,
+                    config.playerSpriteScale,
+                    True,
+                    config.enemyStartCol * config.width,\
+                    config.enemyStartRow * config.height)]
+
 
 # provide the level to the game engine
 print('Starting level:', config.levelName)

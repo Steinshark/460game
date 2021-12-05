@@ -70,10 +70,15 @@ enemyDefinition = '''
 playerStartRow = 2
 playerStartCol = 9
 
+enemyStartRow = 2
+enemyStartCol = 5
+
 # Define the scaling for the player, and speed of the shifts between
 # the various sprites that make up the players.
 playerSpriteSpeed = 0.05
 playerSpriteScale = 0.15
+enemySpriteSpeed = 0.05
+enemySpriteScale = 0.15
 
 # Retrieve the level name from the directory name, don't change this...
 import os
