@@ -7,6 +7,7 @@ from pprint import pp
 import sprites, config
 from player import Player
 from enemy import Enemy
+from spawned_item import Object
 # SI460 Level Definition
 class Level:
     def __init__(self, sprites, hero, enemies=[]):
@@ -23,6 +24,7 @@ class Level:
         self.sprites = sprites
         self.hero    = hero
         self.enemies = enemies
+        self.objects = []
 
     # Here is a complete drawBoard function which will draw the terrain.
     # Lab Part 1 - Draw the board here
@@ -52,11 +54,28 @@ class Level:
 
         # Draw the enemies
         for enemy in self.enemies:
-            enemy.draw(t)
+            enemy.draw(t,config=config)
+        for obj in self.objects:
+            if not obj.draw(t,config=config,level=self,w=800,h=600):
+                print("REMOVED")
+                self.objects.remove(obj)
+        print('objects : ' + str(self.objects))
+
 
         # Draw the hero.
-        self.hero.draw(t, keyTracking,config,enemies)
+        self.hero.draw(t, keyTracking,config,enemies,level=self)
 
+    def add_item(self,dx,dy,type,mode,facing,x,y):
+        self.objects.append(Object(dx,dy,sprites=gameSprites,
+                                    buildSprite = sprites.buildSprite,
+                                    playerClass = type,
+                                    mode = mode,
+                                    facing = facing,
+                                    speed = .05,
+                                    scale = .15,
+                                    loop = True,
+                                    x=x,
+                                    y=y))
 # Load all game sprites
 print('Loading Sprites...')
 gameSprites = sprites.loadAllImages(config.spritespath)
@@ -74,17 +93,17 @@ hero = Player(gameSprites,
 
 # Load in the Enemies
 print('Loading the Enemies...')
+
 enemies = [Enemy(   gameSprites,\
-                    sprites.buildSprite,"enemy-1", "Idle","Right",\
+                    sprites.buildSprite,"enemy-1", "Run","Right",\
                     config.playerSpriteSpeed,
                     config.playerSpriteScale,
                     True,
-                    config.enemyStartCol * config.width,\
-                    config.enemyStartRow * config.height)]
+                    enemy[0] * config.width ,\
+                    enemy[1] * config.height+ 1) for enemy in config.enemies]
+
 
 
 # provide the level to the game engine
 print('Starting level:', config.levelName)
 level = Level(gameSprites, hero, enemies)
-print(level)
-print(config.height*len(config.level.keys()))

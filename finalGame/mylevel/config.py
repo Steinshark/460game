@@ -70,8 +70,6 @@ enemyDefinition = '''
 playerStartRow = 2
 playerStartCol = 9
 
-enemyStartRow = 2
-enemyStartCol = 5
 
 # Define the scaling for the player, and speed of the shifts between
 # the various sprites that make up the players.
@@ -123,5 +121,6 @@ keyMappings = {key.LSHIFT: 'run',    key.RSHIFT: 'run',
 # Determine some very useful information needed in our game.
 from layout import positionEnemies, board2grid
 enemies = positionEnemies(enemyDefinition)
+
 level, rows, cols = board2grid(levelDefinition, tilepath, returnSize=True)
 goals = board2grid(goalDefinition, goalpath)

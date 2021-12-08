@@ -30,9 +30,12 @@ class Player:
         self.dy = 0
         self.jump_x = (3 / 2) * math.pi
         self.step = .1
-        self.debugging = False
+        self.debugging = True
         self.attacking = False
         self.attack_start = 0
+        self.dead = False
+        self.remain_dead = False
+        self.threw = False
         # Build the starting character sprite
         self.changeSprite()
 
@@ -58,6 +61,7 @@ class Player:
                 self.animationX = self.playerSprite.x
                 self.animationY = self.playerSprite.y
 
+
             # Create a new sprite with the passed in buildSprite function
             self.playerSprite = self.buildSprite(self.sprites,
                                                  self.playerClass,
@@ -70,10 +74,11 @@ class Player:
                                                  self.animationY)
 
     # Move the character
-    def movement(self, config, t=0, keyTracking={}):
+    def movement(self, config, t=0, keyTracking={},level=None):
 
         # booleans set
         update, caught_input, self.dx,self.init_jump = (False, False, 0.0, False)
+        mode,facing,loop = (self.mode,self.facing,True)
 
         # Check all key presses
         # RIGHT
@@ -84,10 +89,10 @@ class Player:
 
             # Ensure that player is doing the right action
             if not self.mode == 'Run':
-                self.mode = 'Run'
+                mode = 'Run'
                 update = True
             if not self.facing == 'Right':
-                self.facing = 'Right'
+                facing = 'Right'
                 update = True
         # LEFT
         if key.A in keyTracking.keys() or key.LEFT in keyTracking.keys():
@@ -97,40 +102,46 @@ class Player:
 
             # Ensure that player is doing the right action
             if not self.mode == 'Run':
-                self. mode = 'Run'
+                mode = 'Run'
                 update = True
             if not self.facing == 'Left':
-                self.facing = 'Left'
+                facing = 'Left'
                 update = True
         # RUN
         if key.LSHIFT in keyTracking.keys():
-            if not self.airborne:
-                self.dx *= 3
+            self.dx *= 2
         # JUMP
         if key.SPACE in keyTracking.keys() or key.W in keyTracking.keys() or key.UP in keyTracking.keys():
             caught_input = True
             if not self.mode == 'Jump':
-                self.mode = 'Jump'
+                mode = 'Jump'
                 self.update = True
             if not self.airborne:
                 self.jump_x = (1 / 2) * math.pi
                 self.init_jump = True
                 self.airborne = True
 
-        if key.LCTRL in keyTracking.keys():
+        if key.LALT in keyTracking.keys():
             if not self.attacking:
                 self.attack_start = t
                 self.attacking = True;
                 self.changeSprite("Attack",self.facing,False)
 
+        if key.LCTRL in keyTracking.keys():
+            if not self.threw:
+                self.threw = True
+                if self.facing == 'Right':
+                    weaponSpd = 3
+                else:
+                    weaponSpd = -3
+                level.add_item(weaponSpd,0,"weapon",'Kunai',self.facing,self.playerSprite.x,self.playerSprite.y + self.playerSprite.height/2)
+        # handle cases:
+        #       attacking sequence
         if self.attacking:
             if t - self.attack_start > .41:
                 self.attacking = False
                 self.changeSprite("Idle",self.facing,True)
-
-
-
-        # Handle y movement
+        #       vertical movement
         if self.airborne:
             # Already jumping: update normally
             self.update_position_airborne()
@@ -149,17 +160,29 @@ class Player:
         hori_collision = self.will_collide_h(config)
         if hori_collision == False:
             self.playerSprite.x += self.dx
+
+        # Handle sprite updates
+        if update:
+            self.changeSprite(mode,facing,loop)
         if not caught_input:
             self.changeSprite("Idle",self.facing,True)
-        # Handle sprite updates
+
+        if self.debugging:
+            print(['Px\t','Py\t','dx\t','dy\t'])
+            print([self.playerSprite.x,self.playerSprite.y,self.dx,self.dy])
+            print()
 
     # Draw our character
-    def draw(self, t=0, keyTracking={}, config=None,enemies=None,*other):
+    def draw(self, t=0, keyTracking={}, config=None,enemies=None,level=None,*other):
         self.playerSprite.draw()
-        if self.enemy_collision(enemies) or self.playerSprite.y < config.height:
-            self.end_game()
+        self.check_dead(enemies,config)
+        if self.dead:
+            print('DEAD')
+            if not self.remain_dead:
+                self.changeSprite(mode= 'Dead',facing = self.facing,loop = False)
+
         else:
-            self.movement(config, t, keyTracking)
+            self.movement(config, t=t, keyTracking=keyTracking,level=level)
 
     # A bunch of fun lil funtions that were
     # The death of me.... :)
@@ -276,10 +299,11 @@ class Player:
         p1['y'] <= hitbox['ul']['y'] and \
         p1['y'] >= hitbox['ll']['y']
 
-    def enemy_collision(self,enemies):
+    def check_dead(self,enemies,config):
         level,width,height = (config.level,config.width,config.height)
         delta_x = 0
         delta_y = 0
+        if self.playerSprite.y < 0 or self.playerSprite.y > 600 : return True
 
         # Player collision parametrics
         x_pos = self.playerSprite.x + delta_x
@@ -297,28 +321,25 @@ class Player:
 
         # Terrain collision parametrics
         for enemy in enemies:
-                x,y = enemy.playerSprite.x,enemy.playerSprite.y
-                height = enemy.playerSprite.height
-                width = enemy.playerSprite.width
+            if enemy.dead : continue
+            x,y = enemy.sprite.x,enemy.sprite.y
+            height = enemy.sprite.height
+            width = enemy.sprite.width
 
-                ll = {'x' : x - width/2,          'y' : y}
-                lr = {'x' : x + width/2,  'y' : y}
-                ul = {'x' : x - width/2,          'y' : y + height}
-                ur = {'x' : x + width/2,  'y' : y + height}
+            ll = {'x' : x - width/3,          'y' : y}
+            lr = {'x' : x + width/3,          'y' : y}
+            ul = {'x' : x - width/3,          'y' : y + height - 20}
+            ur = {'x' : x + width/3,          'y' : y + height - 20}
 
-                hitbox = {'ll' : ll ,'lr' : lr ,'ul' : ul ,'ur' : ur}
-                if self.debugging:
-                    for combo in hitbox.values():
-                        pyglet.shapes.Circle(combo['x'],combo['y'], 20, color = (0,0,0)).draw()
+            hitbox = {'ll' : ll ,'lr' : lr ,'ul' : ul ,'ur' : ur}
 
-                for point in player_box.keys():
-                    if self.within(player_box[point],hitbox):
-                        return True
+            if self.debugging:
+                for combo in hitbox.values():
+                    pyglet.shapes.Circle(combo['x'],combo['y'], 2, color = (0,0,0)).draw()
+
+            for point in player_box.keys():
+                if self.within(player_box[point],hitbox):
+                    self.dead = True
+                    return True
 
         return False
-
-    def end_game(self):
-        self.dy = 0
-        self.dx = 0
-        self.mode = 'Dead'
-        self.changeSprite()
