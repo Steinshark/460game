@@ -73,22 +73,23 @@ class Level:
             if not obj.draw(t,config=config,level=self,w=800,h=600):
                 print("REMOVED")
                 self.objects.remove(obj)
-       # print('objects : ' + str(self.objects))
-
 
         # Draw the hero.
-
         self.hero.draw(t,keyTracking,self.enemies,config,level)
-        
-        print(self.hero.playerSprite.x)
-        if self.hero.facing == 'Right' and self.hero.playerSprite.x > (self.scrollX + .75 * width):
-            self.scrollX = - (self.scrollX + (self.hero.playerSprite.x - (self.scrollX + .75 * width)))
-        if self.hero.facing == 'Left' and self.hero.playerSprite.x < (self.scrollX - .25 * width):
-            print("L SCroll cond met")
-            self.scrollX =  (self.scrollX - ((self.scrollX + .25 * width) - self.hero.playerSprite.x))
+        dx = abs(self.hero.dx)
+        dy = abs(self.hero.dy)
+        print(self.hero.playerSprite.y-self.scrollY)
+        if self.hero.facing == 'Right' and self.hero.playerSprite.x-self.scrollX >  .75 * width:
+            self.scrollX -= dx
+        if self.hero.facing == 'Left' and self.hero.playerSprite.x-self.scrollX < .25 * width:
+            self.scrollX += dx
+        if self.hero.playerSprite.y - self.scrollY > .75 * height:
+            self.scrollY += dy
+        if self.hero.playerSprite.y - self.scrollY < .25 * height:
+            self.scrollY -= dy
         # Shift the world
         glLoadIdentity()
-        glTranslatef(self.scrollX, self.scrollY, 0)
+        glTranslatef(self.scrollX, -self.scrollY, 0)
 
     def add_item(self,dx,dy,type,mode,facing,x,y):
         self.objects.append(Object(dx,dy,sprites=gameSprites,
