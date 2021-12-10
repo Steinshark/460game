@@ -22,6 +22,8 @@ class Level:
         self.sprites = sprites
         self.hero    = hero
         self.enemies = enemies
+        self.weapons = weapons
+
 
         # Music in the Background
         # player can hold multiple tracks,

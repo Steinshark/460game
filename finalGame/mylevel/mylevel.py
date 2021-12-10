@@ -8,6 +8,8 @@ import sprites, config
 from player import Player
 from enemy import Enemy
 from spawned_item import Object
+from pyglet.gl import glLoadIdentity, glTranslatef
+
 # SI460 Level Definition
 class Level:
     def __init__(self, sprites, hero, enemies=[]):
@@ -25,6 +27,18 @@ class Level:
         self.hero    = hero
         self.enemies = enemies
         self.objects = []
+
+        # Sound things
+        self.player = pyglet.media.Player()
+        self.background_music = pyglet.media.load('mylevel/music/1.wav')
+        self.player.queue(self.background_music)
+        # start playing the music
+        self.player.loop = True
+        self.player.play()
+        self.delta_x = 0
+        self.delta_y = 0
+        self.scrollX = 0
+        self.scrollY = 0
 
     # Here is a complete drawBoard function which will draw the terrain.
     # Lab Part 1 - Draw the board here
@@ -51,19 +65,30 @@ class Level:
 
         # Draw the gameboard
         self.drawBoard(config.level, 0, 0, config.height, config.width)
-
         # Draw the enemies
         for enemy in self.enemies:
-            enemy.draw(t,config=config)
+            enemy.draw(t,config=config,level=self)
+
         for obj in self.objects:
             if not obj.draw(t,config=config,level=self,w=800,h=600):
                 print("REMOVED")
                 self.objects.remove(obj)
-        print('objects : ' + str(self.objects))
+       # print('objects : ' + str(self.objects))
 
 
         # Draw the hero.
-        self.hero.draw(t, keyTracking,config,enemies,level=self)
+
+        self.hero.draw(t,keyTracking,self.enemies,config,level)
+        
+        print(self.hero.playerSprite.x)
+        if self.hero.facing == 'Right' and self.hero.playerSprite.x > (self.scrollX + .75 * width):
+            self.scrollX = - (self.scrollX + (self.hero.playerSprite.x - (self.scrollX + .75 * width)))
+        if self.hero.facing == 'Left' and self.hero.playerSprite.x < (self.scrollX - .25 * width):
+            print("L SCroll cond met")
+            self.scrollX =  (self.scrollX - ((self.scrollX + .25 * width) - self.hero.playerSprite.x))
+        # Shift the world
+        glLoadIdentity()
+        glTranslatef(self.scrollX, self.scrollY, 0)
 
     def add_item(self,dx,dy,type,mode,facing,x,y):
         self.objects.append(Object(dx,dy,sprites=gameSprites,
@@ -76,6 +101,11 @@ class Level:
                                     loop = True,
                                     x=x,
                                     y=y))
+    def play_sound(self,filename,loop):
+        self.newSound = pyglet.media.load(filename)
+        self.newSound.play()
+        return
+
 # Load all game sprites
 print('Loading Sprites...')
 gameSprites = sprites.loadAllImages(config.spritespath)

@@ -45,7 +45,7 @@ class Player:
 
         # Dont bother changing the Sprite if nothing has changed
         if mode != self.mode or facing != self.facing or self.playerSprite is None:
-            print(mode)
+
             # Should we change the default loop status (example death)
             if loop is not None:
                 self.animationLoop = loop
@@ -74,15 +74,14 @@ class Player:
                                                  self.animationY)
 
     # Move the character
-    def movement(self, config, t=0, keyTracking={},level=None):
-
+    def movement(self, config, t, keyTracking,level):
         # booleans set
         update, caught_input, self.dx,self.init_jump = (False, False, 0.0, False)
         mode,facing,loop = (self.mode,self.facing,True)
 
         # Check all key presses
         # RIGHT
-        if key.D in keyTracking.keys() or key.RIGHT in keyTracking.keys():
+        if key.D in keyTracking.keys() or key   .RIGHT in keyTracking.keys():
             # Make sure velocity is set
             self.dx = 3.0
             caught_input = True
@@ -117,19 +116,24 @@ class Player:
                 mode = 'Jump'
                 self.update = True
             if not self.airborne:
+                level.play_sound('mylevel/music/jump.wav',False)
                 self.jump_x = (1 / 2) * math.pi
                 self.init_jump = True
                 self.airborne = True
 
-        if key.LALT in keyTracking.keys():
+        if 65513 in keyTracking.keys():
+            input("ALT CAUGHT IN KEYS")
             if not self.attacking:
+                level.play_sound('mylevel/music/attack.wav',False)
                 self.attack_start = t
                 self.attacking = True;
-                self.changeSprite("Attack",self.facing,False)
+                self.changeSprite(mode="Attack",facing = self.facing,loop=False)
 
         if key.LCTRL in keyTracking.keys():
             if not self.threw:
                 self.threw = True
+                level.play_sound('mylevel/music/throw.wav',False)
+
                 if self.facing == 'Right':
                     weaponSpd = 3
                 else:
@@ -144,12 +148,12 @@ class Player:
         #       vertical movement
         if self.airborne:
             # Already jumping: update normally
-            self.update_position_airborne()
+            self.update_position_airborne(level)
             self.playerSprite.y += self.dy
         else:
             # Check if theres ground below us:
             self.dy = -1
-            vert_collision = self.will_collide_v(config)
+            vert_collision = self.will_collide_v(config,level)
             self.dy = 0
             # If nothing, then were falling
             if vert_collision == False:
@@ -157,36 +161,40 @@ class Player:
                 self.airborne = True
 
         # Handle x movement
-        hori_collision = self.will_collide_h(config)
+        hori_collision = self.will_collide_h(config,level)
         if hori_collision == False:
             self.playerSprite.x += self.dx
 
         # Handle sprite updates
         if update:
             self.changeSprite(mode,facing,loop)
-        if not caught_input:
+        if not caught_input and not self.attacking:
             self.changeSprite("Idle",self.facing,True)
 
         if self.debugging:
-            print(['Px\t','Py\t','dx\t','dy\t'])
-            print([self.playerSprite.x,self.playerSprite.y,self.dx,self.dy])
-            print()
-
+            pass
+            #print(['Px\t','Py\t','dx\t','dy\t'])
+            #print([self.playerSprite.x,self.playerSprite.y,self.dx,self.dy])
+            #print()
+        print(self.attacking)
     # Draw our character
-    def draw(self, t=0, keyTracking={}, config=None,enemies=None,level=None,*other):
+    def draw(self, t, keyTracking, enemies,config,level,*other):
         self.playerSprite.draw()
         self.check_dead(enemies,config)
         if self.dead:
             print('DEAD')
             if not self.remain_dead:
                 self.changeSprite(mode= 'Dead',facing = self.facing,loop = False)
+                level.play_sound('mylevel/music/hero_death.wav',False)
+                self.remain_dead = True
+
 
         else:
-            self.movement(config, t=t, keyTracking=keyTracking,level=level)
+            self.movement(config, t, keyTracking,level)
 
     # A bunch of fun lil funtions that were
     # The death of me.... :)
-    def update_position_airborne(self):
+    def update_position_airborne(self,level):
         #find the next x_coordinate for our jump
         if self.jump_x >= 3 * (math.pi/2.0):
             self.jump_x = 3 * (math.pi/2.0)
@@ -197,7 +205,7 @@ class Player:
         self.dy = 17*math.sin(self.jump_x)
 
         # Handle if the next update will be a collision
-        if ((res := self.will_collide_v(config)) != False) and not self.init_jump:
+        if ((res := self.will_collide_v(config,level)) != False) and not self.init_jump:
             if res[0] == 'upper':
                 self.dy = res[2]['ll']['y'] - res[1]['y'] - .01
                 self.jump_x = math.pi + .5
@@ -206,24 +214,23 @@ class Player:
                 self.jump_x = (3/2) * math.pi
                 self.airborne = False
 
-    def check_collision_vert(self,config):
+    def check_collision_vert(self,config,level):
         # Level-specific data
-        level,width,height = (config.level,config.width,config.height)
-        delta_x = 0
-        delta_y = 0
+        configLevel,width,height = (config.level,config.width,config.height)
+
 
         # Player collision hitbox
-        x_pos = self.playerSprite.x + delta_x
-        y_pos = self.playerSprite.y + delta_y
+        x_pos = self.playerSprite.x
+        y_pos = self.playerSprite.y
         player_line = {'bot' : {'x' : x_pos,'y' : y_pos},\
                        'top' : {'x' : x_pos,'y' : y_pos + ( self.playerSprite.height)}}
 
         # Check all terrain boxes
-        for row in level.keys():
-            for col in level[row]:
+        for row in configLevel.keys():
+            for col in configLevel[row]:
 
                 # Terrain collision hitbox
-                x,y = col*width + delta_x , row*height + delta_y
+                x,y = col*width , row*height
                 ll = {'x' :     x           ,'y' :   y              }
                 lr = {'x' :     x + width   ,'y' :   y              }
                 ul = {'x' :     x           ,'y' :   y + height     }
@@ -240,15 +247,15 @@ class Player:
 
         return False
 
-    def check_collision_hori(self,config):
+    def check_collision_hori(self,config,level):
         # Level-specific data
-        level,width,height = (config.level,config.width,config.height)
-        delta_x = 0
-        delta_y = 0
+        configLevel,width,height = (config.level,config.width,config.height)
+
+
 
         # Player collision hitbox
-        x_pos = self.playerSprite.x + delta_x
-        y_pos = self.playerSprite.y + delta_y
+        x_pos = self.playerSprite.x
+        y_pos = self.playerSprite.y
         player_box = {
                       'll' : {'x' : x_pos - self.playerSprite.width / 2 ,'y' : y_pos},                           \
                       'lr' : {'x' : x_pos + self.playerSprite.width / 2 ,'y' : y_pos},                           \
@@ -257,11 +264,11 @@ class Player:
                      }
 
         # Terrain collision hitbox
-        for row in level.keys():
-            for col in level[row]:
+        for row in configLevel.keys():
+            for col in configLevel[row]:
 
                 # Terrain collision hitbox
-                x,y = col*width + delta_x , row*height + delta_y
+                x,y = col*width  , row*height
                 ll = {'x' : x,          'y' : y}
                 lr = {'x' : x + width,  'y' : y}
                 ul = {'x' : x,          'y' : y + height}
@@ -274,19 +281,19 @@ class Player:
                         return (point,player_box[point],hitbox)
         return False
 
-    def will_collide_v(self,config):
+    def will_collide_v(self,config,level):
         self.playerSprite.y += self.dy
 
-        collision = self.check_collision_vert(config)
+        collision = self.check_collision_vert(config,level)
 
         self.playerSprite.y -= self.dy
 
         return collision
 
-    def will_collide_h(self,config):
+    def will_collide_h(self,config,level):
         self.playerSprite.x += self.dx
 
-        collision = self.check_collision_hori(config)
+        collision = self.check_collision_hori(config,level)
 
         self.playerSprite.x -= self.dx
 
@@ -303,7 +310,9 @@ class Player:
         level,width,height = (config.level,config.width,config.height)
         delta_x = 0
         delta_y = 0
-        if self.playerSprite.y < 0 or self.playerSprite.y > 600 : return True
+        if self.playerSprite.y < 0 :
+            self.dead = True
+            return True
 
         # Player collision parametrics
         x_pos = self.playerSprite.x + delta_x
@@ -326,10 +335,10 @@ class Player:
             height = enemy.sprite.height
             width = enemy.sprite.width
 
-            ll = {'x' : x - width/3,          'y' : y}
-            lr = {'x' : x + width/3,          'y' : y}
-            ul = {'x' : x - width/3,          'y' : y + height - 20}
-            ur = {'x' : x + width/3,          'y' : y + height - 20}
+            ll = {'x' : x - width/3 - 10,          'y' : y -5}
+            lr = {'x' : x + width/3 + 10,          'y' : y -5}
+            ul = {'x' : x - width/3 - 10,          'y' : y + height - 20}
+            ur = {'x' : x + width/3 + 10,          'y' : y + height - 20}
 
             hitbox = {'ll' : ll ,'lr' : lr ,'ul' : ul ,'ur' : ur}
 
