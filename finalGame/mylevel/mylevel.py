@@ -55,6 +55,7 @@ class Level:
 
                 img[row][col].blit(x,y,height=height,width=width)
 
+
     def draw(self, t=0, width=800, height=600, keyTracking={}, mouseTracking=[], *other):
 
         # Draw the game background
@@ -70,23 +71,31 @@ class Level:
             enemy.draw(t,config=config,level=self)
 
         for obj in self.objects:
-            if not obj.draw(t,config=config,level=self,w=800,h=600):
+            if not obj.draw(t,config=config,level=self,w=width,h=width):
                 print("REMOVED")
                 self.objects.remove(obj)
 
         # Draw the hero.
         self.hero.draw(t,keyTracking,self.enemies,config,level)
+
+        # Calculate the scrolling
         dx = abs(self.hero.dx)
         dy = abs(self.hero.dy)
-        print(self.hero.playerSprite.y-self.scrollY)
-        if self.hero.facing == 'Right' and self.hero.playerSprite.x-self.scrollX >  .75 * width:
+        relative_pos_x = self.hero.playerSprite.x + self.scrollX
+        relative_pos_y = self.hero.playerSprite.y - self.scrollY
+        print(f'x:{self.hero.playerSprite.x} scrollX: {self.scrollX} relative {relative_pos_x}')
+        if relative_pos_x >  .75 * width:
             self.scrollX -= dx
-        if self.hero.facing == 'Left' and self.hero.playerSprite.x-self.scrollX < .25 * width:
+        if relative_pos_x < .25 * width:
             self.scrollX += dx
-        if self.hero.playerSprite.y - self.scrollY > .75 * height:
+        if relative_pos_y > .75 * height:
             self.scrollY += dy
-        if self.hero.playerSprite.y - self.scrollY < .25 * height:
+        if relative_pos_y < .25 * height:
             self.scrollY -= dy
+
+        self.background_x = -.25 * self.scrollX
+        self.background_y =  .25 * self.scrollY
+
         # Shift the world
         glLoadIdentity()
         glTranslatef(self.scrollX, -self.scrollY, 0)

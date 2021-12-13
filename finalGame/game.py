@@ -49,7 +49,6 @@ class Game:
                 self.screenshot = self.screenshot + 1
                 pyglet.image.get_buffer_manager().get_color_buffer().save(sys.argv[-1]+'.'+str(self.screenshot)+'.png')
             self.keyTracking[symbol] = modifiers
-            print("collected " + str(symbol))
         # Handle Key Releases in our World
         @self.window.event
         def on_key_release(symbol, modifiers):

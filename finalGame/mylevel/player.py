@@ -29,8 +29,10 @@ class Player:
         self.dx = 0
         self.dy = 0
         self.jump_x = (3 / 2) * math.pi
+        (3 / 2) * math.pi
         self.step = .1
         self.debugging = True
+        self.attacking = False
         self.attacking = False
         self.attack_start = 0
         self.dead = False
@@ -121,30 +123,31 @@ class Player:
                 self.init_jump = True
                 self.airborne = True
 
-        if 65513 in keyTracking.keys():
-            input("ALT CAUGHT IN KEYS")
-            if not self.attacking:
-                level.play_sound('mylevel/music/attack.wav',False)
-                self.attack_start = t
-                self.attacking = True;
-                self.changeSprite(mode="Attack",facing = self.facing,loop=False)
-
         if key.LCTRL in keyTracking.keys():
             if not self.threw:
                 self.threw = True
+                self.changeSprite(mode='Throw')
                 level.play_sound('mylevel/music/throw.wav',False)
 
                 if self.facing == 'Right':
-                    weaponSpd = 6
+                    weaponSpd = 10
                 else:
-                    weaponSpd = -6
+                    weaponSpd = -10
                 level.add_item(weaponSpd,0,"weapon",'Kunai',self.facing,self.playerSprite.x,self.playerSprite.y + self.playerSprite.height/2)
         # handle cases:
         #       attacking sequence
+        if key.LALT in keyTracking.keys():
+            if not self.attacking:
+                self.attacking = True
+                self.attack_start = t
+                level.play_sound('mylevel/music/attack.wav',False)
+                print("\n\n\nATTACK\n\n\n")
+                self.changeSprite(mode="Attack")
+
         if self.attacking:
             if t - self.attack_start > .41:
                 self.attacking = False
-                self.changeSprite("Idle",self.facing,True)
+                self.changeSprite("Idle",facing=facing,loop=False)
         #       vertical movement
         if self.airborne:
             # Already jumping: update normally
@@ -170,7 +173,7 @@ class Player:
             self.changeSprite(mode,facing,loop)
 
         # Set idle if no updates
-        if not caught_input and not self.attacking:
+        if not caught_input and not self.attacking and not self.attacking:
             self.changeSprite("Idle",self.facing,True)
 
 
