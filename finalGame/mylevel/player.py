@@ -36,13 +36,13 @@ class Player:
         self.dead = False
         self.remain_dead = False
         self.threw = False
+
+        self.hitbox_size = .15*(self.sprites['hero']['Run']['Right'][0].get_image_data().width + self.sprites['hero']['Idle']['Right'][0].get_image_data().width) / 4
         # Build the starting character sprite
         self.changeSprite()
 
 # Build or change the player's Sprite
     def changeSprite(self, mode=None, facing=None, loop=None):
-
-
         # Dont bother changing the Sprite if nothing has changed
         if mode != self.mode or facing != self.facing or self.playerSprite is None:
 
@@ -110,7 +110,7 @@ class Player:
         if key.LSHIFT in keyTracking.keys():
             self.dx *= 2
         # JUMP
-        if key.SPACE in keyTracking.keys() or key.W in keyTracking.keys() or key.UP in keyTracking.keys():
+        if key.W in keyTracking.keys() or key.SPACE in keyTracking.keys() or key.UP in keyTracking.keys():
             caught_input = True
             if not self.mode == 'Jump':
                 mode = 'Jump'
@@ -135,9 +135,9 @@ class Player:
                 level.play_sound('mylevel/music/throw.wav',False)
 
                 if self.facing == 'Right':
-                    weaponSpd = 3
+                    weaponSpd = 6
                 else:
-                    weaponSpd = -3
+                    weaponSpd = -6
                 level.add_item(weaponSpd,0,"weapon",'Kunai',self.facing,self.playerSprite.x,self.playerSprite.y + self.playerSprite.height/2)
         # handle cases:
         #       attacking sequence
@@ -168,15 +168,12 @@ class Player:
         # Handle sprite updates
         if update:
             self.changeSprite(mode,facing,loop)
+
+        # Set idle if no updates
         if not caught_input and not self.attacking:
             self.changeSprite("Idle",self.facing,True)
 
-        if self.debugging:
-            pass
-            #print(['Px\t','Py\t','dx\t','dy\t'])
-            #print([self.playerSprite.x,self.playerSprite.y,self.dx,self.dy])
-            #print()
-        print(self.attacking)
+
     # Draw our character
     def draw(self, t, keyTracking, enemies,config,level,*other):
         self.playerSprite.draw()
@@ -222,8 +219,11 @@ class Player:
         # Player collision hitbox
         x_pos = self.playerSprite.x
         y_pos = self.playerSprite.y
-        player_line = {'bot' : {'x' : x_pos,'y' : y_pos},\
-                       'top' : {'x' : x_pos,'y' : y_pos + ( self.playerSprite.height)}}
+        player_box = {'ll' : {'x' : x_pos - self.hitbox_size ,'y' : y_pos},\
+                      'lr' : {'x' : x_pos + self.hitbox_size ,'y' : y_pos},\
+                      'ul' : {'x' : x_pos - self.hitbox_size ,'y' : y_pos + self.playerSprite.height},\
+                      'ur' : {'x' : x_pos + self.hitbox_size ,'y' : y_pos + self.playerSprite.height}
+                     }
 
         # Check all terrain boxes
         for row in configLevel.keys():
@@ -238,12 +238,12 @@ class Player:
                 hitbox = {'ll' : ll ,'lr' : lr ,'ul' : ul ,'ur' : ur}
 
                 # Check hit from above
-                if self.within(player_line['top'],hitbox):
-                    return ("upper", player_line['top'], hitbox)
+                if self.within(player_box['ul'],hitbox) or self.within(player_box['ur'],hitbox) :
+                    return ("upper", player_box['ul'], hitbox)
 
                 # Check hit from below
-                if self.within(player_line['bot'], hitbox):
-                    return ("lower", player_line['bot'], hitbox)
+                if self.within(player_box['ll'], hitbox) or self.within(player_box['lr'],hitbox):
+                    return ("lower", player_box['ll'], hitbox)
 
         return False
 
@@ -251,17 +251,21 @@ class Player:
         # Level-specific data
         configLevel,width,height = (config.level,config.width,config.height)
 
-
-
         # Player collision hitbox
         x_pos = self.playerSprite.x
         y_pos = self.playerSprite.y
         player_box = {
-                      'll' : {'x' : x_pos - self.playerSprite.width / 2 ,'y' : y_pos},                           \
-                      'lr' : {'x' : x_pos + self.playerSprite.width / 2 ,'y' : y_pos},                           \
-                      'ul' : {'x' : x_pos - self.playerSprite.width / 2 ,'y' : y_pos + self.playerSprite.height},\
-                      'ur' : {'x' : x_pos + self.playerSprite.width / 2 ,'y' : y_pos + self.playerSprite.height} \
+                      'll' : {'x' : x_pos - self.hitbox_size ,'y' : y_pos},                           \
+                      'lr' : {'x' : x_pos + self.hitbox_size ,'y' : y_pos},                           \
+                      'ul' : {'x' : x_pos - self.hitbox_size ,'y' : y_pos + self.playerSprite.height},\
+                      'ur' : {'x' : x_pos + self.hitbox_size ,'y' : y_pos + self.playerSprite.height} \
                      }
+
+        if self.debugging:
+            for point in player_box.values():
+                color = (255,0,0)
+                pyglet.shapes.Circle(point['x'],point['y'], 2, color = color).draw()
+
 
         # Terrain collision hitbox
         for row in configLevel.keys():
@@ -283,18 +287,14 @@ class Player:
 
     def will_collide_v(self,config,level):
         self.playerSprite.y += self.dy
-
         collision = self.check_collision_vert(config,level)
-
         self.playerSprite.y -= self.dy
 
         return collision
 
     def will_collide_h(self,config,level):
         self.playerSprite.x += self.dx
-
         collision = self.check_collision_hori(config,level)
-
         self.playerSprite.x -= self.dx
 
         return collision
@@ -318,10 +318,10 @@ class Player:
         x_pos = self.playerSprite.x + delta_x
         y_pos = self.playerSprite.y + delta_y
 
-        player_box = {'ll' : {'x' : x_pos - self.playerSprite.width / 2 ,'y' : y_pos},\
-                      'lr' : {'x' : x_pos + self.playerSprite.width / 2 ,'y' : y_pos},\
-                      'ul' : {'x' : x_pos - self.playerSprite.width / 2 ,'y' : y_pos + self.playerSprite.height},\
-                      'ur' : {'x' : x_pos + self.playerSprite.width / 2 ,'y' : y_pos + self.playerSprite.height}
+        player_box = {'ll' : {'x' : x_pos - self.hitbox_size ,'y' : y_pos},\
+                      'lr' : {'x' : x_pos + self.hitbox_size ,'y' : y_pos},\
+                      'ul' : {'x' : x_pos - self.hitbox_size ,'y' : y_pos + self.playerSprite.height},\
+                      'ur' : {'x' : x_pos + self.hitbox_size ,'y' : y_pos + self.playerSprite.height}
                      }
         if self.debugging:
             for point in player_box.values():
