@@ -37,6 +37,7 @@ def board2grid(board, tilepath='sprites/tiles', returnSize=False):
         return results, row, max_cols
     return results
 
+
 # Here is a function that will determine where the enemies should start
 # based on the definition above.
 def positionEnemies(board):

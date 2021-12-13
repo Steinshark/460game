@@ -22,7 +22,6 @@ def loadImages(filepath="mylevel/sprites/hero"):
     files = os.listdir(filepath)
     files.sort()
     results = {}
-
     # Lets fix the numbering problem (1, 10, 2, 3, etc.)
     for f in files:
         if f.find('.png') != -1 and f.find('(') != -1:
@@ -39,7 +38,6 @@ def loadImages(filepath="mylevel/sprites/hero"):
                 results[mode] = {'Right':{}, 'Left':{}}
             results[mode]['Right'][seqnum] = filepath+'/'+f
             results[mode]['Left'][seqnum] = filepath+'/'+f
-
     # Now lets start the process to load the actual images, now that
     # the order will be correct.
     for mode in results:
