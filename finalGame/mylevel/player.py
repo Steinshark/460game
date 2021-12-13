@@ -141,10 +141,21 @@ class Player:
                 self.attacking = True
                 self.attack_start = t
                 level.play_sound('mylevel/music/attack.wav',False)
-                print("\n\n\nATTACK\n\n\n")
                 self.changeSprite(mode="Attack")
 
+
+
         if self.attacking:
+            for enemy in level.enemies:
+                distance_y = self.playerSprite.y - enemy.sprite.y
+                distance_x = self.playerSprite.x - enemy.sprite.x + self.playerSprite.width
+                print(f'x: {self.playerSprite.x} y: {self.playerSprite.y} eX: {enemy.sprite.x} + eY: {enemy.sprite.y}')
+                if self.facing == 'Right':
+                    if distance_x > 0 and distance_x < 30 and distance_y < 50:
+                        enemy.dead = True
+                elif self.facing == 'Left':
+                    if distance_x < 0 and distance_x > -30 and distance_y < 50:
+                        enemy.dead = True
             if t - self.attack_start > .41:
                 self.attacking = False
                 self.changeSprite("Idle",facing=facing,loop=False)
