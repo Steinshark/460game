@@ -213,7 +213,7 @@ class Player:
             self.jump_x += self.step
 
         # still tuning this parameter
-        self.dy = 17*math.sin(self.jump_x)
+        self.dy = 12*math.sin(self.jump_x)
 
         # Handle if the next update will be a collision
         if ((res := self.will_collide_v(config,level)) != False) and not self.init_jump:
