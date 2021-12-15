@@ -25,7 +25,7 @@ class Game:
         # Count screenshots
         self.screenshot = 0
 
-        # Build the OpenGL / Pyglet Window
+        # Build the OpenGL / Pygle((t Window
         self.window = pyglet.window.Window(width=self.width, height=self.height, resizable=resizable, caption=caption)
 
         # Fix transparent issue...

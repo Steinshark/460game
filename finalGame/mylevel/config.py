@@ -17,53 +17,126 @@ width  = 50
 
 # Define the board
 levelDefinition = '''
-11 um ur
-10 mm mr                               hl hr
-09 mm mr
-08 mm mr
-07 mm mr                   hl hm hm hm hm hm hm hm hm um ur
-06 mm mr                                              ml mr
-05 mm mr          hl hr                               ml mr
-04 mm mr                                              ml mr
-03 mm cr wl ur                                        ml mr                                                 ul ur
-02 mm mm mm mr                                        ml mr                                                 ml mr
-01 mm mm mm cr wl um um um um um um um ur             ml mr                                     ul um um wr cl mr
-00 mm mm mm mm mm mm mm mm mm mm mm mm cr wl um um wr cl cr wl um ur bu ul um um ur    ul um um cl mm mm mm mm mr
-00 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36
+36
+35
+34
+33
+32
+31
+30
+29
+28
+27
+26
+25                                                                          hl hm hm hm hm um um um um um um um mm mr
+24                                                                                         hl mm mm mm mm mm mm mr
+23                                                                                         hl mm mm mm mr
+22
+21
+20
+19
+18
+17 um ur
+16 mm mr                               hl hr                                     um um um um um um um ur
+15 mm mr                                                             hl um um um mm mm mm mm mm mm mr
+14 mm mr                                                                ml mm mm mm mm mm mm mr
+13 mm mr                   hl hm hm hm hm hm hm hm hm um ur                ml mm mm mr
+12 mm mr                                              ml mr
+11 mm mr           hr                                 ml mr
+10 mm mr                                              ml mr
+09 mm cr wl ur                      bt                ml mr                                                 ul ur
+08 mm mm mm mr                      bb                ml mr                                                 ml mr
+07 mm mm mm cr wl um um um um um um um ur             ml mr                                     ul um um wr cl mr
+06 mm mm mm mm mm mm mm mm mm mm mm mm cr wl um um wr cl cr wl um ur bu ul um          ul um um cl mm mm mm mm mr mm mm mm mm mm mm m
+05 mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm um       mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm
+04 mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm          mm mm mm mm mm mm       mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm
+03 mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm                               mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm
+02 mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm                      mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm
+01 mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm
+00 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80
 '''
 
 # Define the objects
 goalDefinition = '''
-11
-10
-09
-08
-07
-06
-05
-04                                                                                                             sm
-03
-02
-01
-00
-00 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36
+36
+35
+34
+33
+32
+31
+30
+29
+28
+27
+26                                                                                                  sm
+25
+24
+23
+22
+21
+20
+19
+18
+17 um ur
+16 mm mr
+15 mm mr
+14 mm mr                                                                ml mm mm mm mm mm mm mr
+13 mm mr                   hl hm hm hm hm hm hm hm hm um ur                ml mm mm mr
+12 mm mr                                              ml mr
+11 mm mr           hr                                 ml mr
+10 mm mr                                              ml mr
+09 mm cr wl ur                      bt                ml mr                                                 ul ur
+08 mm mm mm mr                      bb                ml mr                                                 ml mr
+07 mm mm mm cr wl um um um um um um um ur             ml mr                                     ul um um wr cl mr
+06 mm mm mm mm mm mm mm mm mm mm mm mm cr wl um um wr cl cr wl um ur bu ul um um ur    ul um um cl mm mm mm mm mrmm mm mm mm mm mm m
+05 mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm
+04 mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm
+03 mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm
+02 mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm
+01 mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm
+00 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80
 '''
 
 # Define the enemies
 enemyDefinition = '''
-11
-10
-09
-08                               e1       e2
-07
-06
-05
-04
-03
-02                                  e2                                                             e1
-01
-00
-00 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36
+36
+35
+34
+33
+32
+31
+30
+29
+28
+27
+26                                                                                                  e1
+25
+24                                                                                         hl mm mm mm mm mm mm mr
+23                                                                                         hl mm mm mm mr
+22
+21
+20
+19
+18
+17 um ur                                                                            e1
+16 mm mr                               hl hr                                     um um um um um um um ur
+15 mm mr                                                             hl um um um mm mm mm mm mm mm mr
+14 mm mr                                  e1                            ml mm mm mm mm mm mm mr
+13 mm mr                   hl hm hm hm hm hm hm hm hm um ur                ml mm mm mr
+12 mm mr                                              ml mr
+11 mm mr           hr                                 ml mr
+10 mm mr                                              ml mr
+09 mm cr wl ur                                        ml mr                                                 ul ur
+08 mm mm mm mr                         e1             ml mr                                                 ml mr
+07 mm mm mm cr wl um um um um um um um ur             ml mr                                     ul um um wr cl mr
+06 mm mm mm mm mm mm mm mm mm mm mm mm cr wl um um wr cl cr wl um ur bu ul um          ul um um cl mm mm mm mm mr mm mm mm mm mm mm m
+05 mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm um       mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm
+04 mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm          mm mm mm mm mm mm       mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm
+03 mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm                               mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm
+02 mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm                      mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm
+01 mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm
+00 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80
+'''
 '''
 
 # Define where the player will start on the board

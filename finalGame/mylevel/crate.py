@@ -13,13 +13,13 @@ class Crate:
         self.objSprites      = sprites
         self.buildSprite  = buildSprite
         self.objSprite = None
-
-
         # Some basic settings
         self.animationSpeed = speed
-        self.animationScale = 1.0
+        self.animationScale = 1.3
         self.animationLoop  = loop
-        self.animationX     = x
+
+        self.offset         = 50 - ((facing=='Left') * 100)
+        self.animationX     = x + self.offset
         self.animationY     = y + .5
         self.playerClass    = playerClass
         self.mode           = mode
@@ -33,6 +33,16 @@ class Crate:
 
         # Build the starting character sprite
         self.changeSprite()
+
+
+        x,y = self.objSprite.x, self.objSprite.y
+        width,height = self.objSprite.width, self.objSprite.height
+        item_hitbox = {}
+        ll = {'x' : x - width/2,            'y' : y}
+        lr = {'x' : x + width/2,            'y' : y}
+        ul = {'x' : x - width/2,            'y' : y + height}
+        ur = {'x' : x + width/2,            'y' : y + height}
+        self.hitbox = {'ll' : ll ,'lr' : lr ,'ul' : ul ,'ur' : ur}
 
 
 
@@ -59,24 +69,14 @@ class Crate:
     # Draw our character
     def draw(self, t=0, keyTracking={}, config=None,level=None,w=800,h=600,*other):
         self.objSprite.draw()
-        print(f"scale is at {self.animationScale}")
         return self.check_remove(config,w,h,level)
 
     def check_remove(self,config,w,h,level):
-        return      not (time.time() - self.t_0 > 10 or self.check_weapon_hit(level))
+        return      not (time.time() - self.t_0 > 3.2 or self.check_weapon_hit(level))
 
 
     def check_weapon_hit(self,level):
-        x,y = self.objSprite.x, self.objSprite.y
-        width,height = self.objSprite.width, self.objSprite.height
-        item_hitbox = {}
-        ll = {'x' : x - width/2,          'y' : y}
-        lr = {'x' : x + width/2,  'y' : y}
-        ul = {'x' : x - width/2,          'y' : y + height}
-        ur = {'x' : x + width/2,  'y' : y + height}
-        hitbox = {'ll' : ll ,'lr' : lr ,'ul' : ul ,'ur' : ur}
-
-        for point in hitbox.values():
+        for point in self.hitbox.values():
             color = (255,0,0)
             pyglet.shapes.Circle(point['x'],point['y'], 2, color = color).draw()
 
@@ -85,7 +85,7 @@ class Crate:
             if  weapon.mode == 'Block':
                 continue
             point = {'only' : {'x' : weapon.objSprite.x, 'y': weapon.objSprite.y}}
-            if self.within(point['only'],hitbox):
+            if self.within(point['only'],self.hitbox):
                 dead = True
                 return True
         return False
@@ -113,25 +113,6 @@ class Crate:
 
         return False
 
-    def will_collide_v(self,config):
-        self.objSprite.x += self.dx
-        self.objSprite.y += self.dy
-
-        collision = self.check_collision_vert(config)
-
-        self.objSprite.x -= self.dx
-        self.objSprite.y -= self.dy
-
-        return collision
-
-    def will_collide_h(self,config):
-        self.objSprite.x += self.dx
-
-        collision = self.check_collision_hori(config)
-
-        self.objSprite.x -= self.dx
-
-        return collision
 
     def within(self,p1,hitbox):
         return \

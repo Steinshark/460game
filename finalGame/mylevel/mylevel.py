@@ -7,7 +7,7 @@ from pprint import pp
 import sprites, config
 from player import Player
 from enemy import Enemy
-from spawned_item import Object
+from weapon import Object
 from crate import Crate
 from pyglet.gl import glLoadIdentity, glTranslatef
 
@@ -90,20 +90,19 @@ class Level:
             self.scrollX += dx
         if relative_pos_y > .75 * height:
             self.scrollY += dy
-        if relative_pos_y < .25 * height:
+        if relative_pos_y < .15 * height:
             self.scrollY -= dy
 
-        self.background_x = -.25 * self.scrollX
-        self.background_y =  .25 * self.scrollY
+        self.background_x = -.9 * self.scrollX
+        self.background_y =   1 * self.scrollY
 
         # Shift the world
         glLoadIdentity()
         glTranslatef(self.scrollX, -self.scrollY, 0)
 
-    def add_item(self,dx,dy,type,mode
-    ,facing,x,y):
+    def add_item(self,dx,dy,type,mode,facing,x,y):
         if type == 'block':
-            self.objects.append(Crate(dx,dy,sprites=gameSprites,
+                self.objects.append(Crate(dx,dy,sprites=gameSprites,
                                         buildSprite = sprites.buildSprite,
                                         playerClass = type,
                                         mode = mode,

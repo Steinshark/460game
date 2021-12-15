@@ -24,7 +24,9 @@ class Player:
         self.mode           = mode
         self.facing         = facing
         self.Loop           = False
-        # Movement items
+
+
+        # udpated items
         self.airborne = False
         self.dx = 0
         self.dy = 0
@@ -33,11 +35,11 @@ class Player:
         self.step = .1
         self.debugging = True
         self.attacking = False
-        self.attacking = False
         self.attack_start = 0
         self.dead = False
         self.remain_dead = False
         self.threw = False
+        self.place_block = 0.0
 
         self.hitbox_size = .15*(self.sprites['hero']['Run']['Right'][0].get_image_data().width + self.sprites['hero']['Idle']['Right'][0].get_image_data().width) / 4
         # Build the starting character sprite
@@ -142,17 +144,28 @@ class Player:
                 self.attack_start = t
                 level.play_sound('mylevel/music/attack.wav',False)
                 self.changeSprite(mode="Attack")
+
+        # Place blocks
         if key.E in keyTracking.keys():
-            level.add_item(0,0,"block",'Block',self.facing,self.playerSprite.x,self.playerSprite.y + self.playerSprite.height/2)
+            if t - self.place_block > 2:
+                self.place_block = t
+                level.add_item(0,0,"block",'Block',self.facing,self.playerSprite.x,self.playerSprite.y + self.playerSprite.height/2)
 
-
-
+        if key.R in keyTracking.keys():
+            col = math.floor(self.playerSprite.x/config.width)
+            row = math.floor(self.playerSprite.y/config.height) - 1
+            print(f'row: {row} col : {col}')
+            import pprint
+            pprint.pp(config.level)
+            input()
+            del(config.level[row][col])
 
         if self.attacking:
             for enemy in level.enemies:
-                distance_y = self.playerSprite.y - enemy.sprite.y
+                distance_y = abs(self.playerSprite.y - enemy.sprite.y)
                 distance_x = self.playerSprite.x - enemy.sprite.x + self.playerSprite.width
-                print(f'x: {self.playerSprite.x} y: {self.playerSprite.y} eX: {enemy.sprite.x} + eY: {enemy.sprite.y}')
+                print(f'dx: {distance_x} dy: {distance_y} ')
+
                 if self.facing == 'Right':
                     if distance_x > 0 and distance_x < 30 and distance_y < 50:
                         enemy.dead = True
@@ -190,13 +203,14 @@ class Player:
         if not caught_input and not self.attacking and not self.attacking:
             self.changeSprite("Idle",self.facing,True)
 
-
     # Draw our character
     def draw(self, t, keyTracking, enemies,config,level,*other):
         self.playerSprite.draw()
         self.check_dead(enemies,config)
         if self.dead:
             print('DEAD')
+            self.update_position_airborne(level)
+            self.playerSprite.y += self.dy
             if not self.remain_dead:
                 self.changeSprite(mode= 'Dead',facing = self.facing,loop = False)
                 level.play_sound('mylevel/music/hero_death.wav',False)
@@ -221,7 +235,8 @@ class Player:
         # Handle if the next update will be a collision
         if ((res := self.will_collide_v(config,level)) != False) and not self.init_jump:
             if res[0] == 'upper':
-                self.dy = res[2]['ll']['y'] - res[1]['y'] - .01
+                #self.dy = res[2]['ll']['y'] - res[1]['y'] - .01
+                self.dy = (self.playerSprite.y + self.playerSprite.height - res[2]['ll']['y']) - .01
                 self.jump_x = math.pi + .5
             elif res[0] == 'lower':
                 self.dy = -abs(res[2]['ul']['y'] - self.playerSprite.y) + .01
@@ -236,10 +251,10 @@ class Player:
         # Player collision hitbox
         x_pos = self.playerSprite.x
         y_pos = self.playerSprite.y
-        player_box = {'ll' : {'x' : x_pos - self.hitbox_size ,'y' : y_pos},\
-                      'lr' : {'x' : x_pos + self.hitbox_size ,'y' : y_pos},\
-                      'ul' : {'x' : x_pos - self.hitbox_size ,'y' : y_pos + self.playerSprite.height},\
-                      'ur' : {'x' : x_pos + self.hitbox_size ,'y' : y_pos + self.playerSprite.height}
+        player_box = {'ll' : {'x' : x_pos - self.hitbox_size*.8 ,'y' : y_pos},\
+                      'lr' : {'x' : x_pos + self.hitbox_size*.8 ,'y' : y_pos},\
+                      'ul' : {'x' : x_pos - self.hitbox_size*.8 ,'y' : y_pos + self.playerSprite.height*.85},\
+                      'ur' : {'x' : x_pos + self.hitbox_size*.8 ,'y' : y_pos + self.playerSprite.height*.85}
                      }
 
         # Check all terrain boxes
@@ -261,6 +276,12 @@ class Player:
                 # Check hit from below
                 if self.within(player_box['ll'], hitbox) or self.within(player_box['lr'],hitbox):
                     return ("lower", player_box['ll'], hitbox)
+        for crate in level.objects:
+            if crate.playerClass == 'block':
+                if self.within(player_box['ll'], crate.hitbox) or self.within(player_box['lr'],crate.hitbox):
+                    return ("lower", player_box['ll'], crate.hitbox)
+                if self.within(player_box['ul'],crate.hitbox) or self.within(player_box['ur'],crate.hitbox) :
+                    return ("upper", player_box['ul'], crate.hitbox)
 
         return False
 
@@ -274,6 +295,10 @@ class Player:
         player_box = {
                       'll' : {'x' : x_pos - self.hitbox_size ,'y' : y_pos},                           \
                       'lr' : {'x' : x_pos + self.hitbox_size ,'y' : y_pos},                           \
+                      'ml' : {'x' : x_pos - self.hitbox_size ,'y' : y_pos + self.playerSprite.height*.5},\
+
+                      'mr' : {'x' : x_pos + self.hitbox_size ,'y' : y_pos + self.playerSprite.height*.5},\
+
                       'ul' : {'x' : x_pos - self.hitbox_size ,'y' : y_pos + self.playerSprite.height},\
                       'ur' : {'x' : x_pos + self.hitbox_size ,'y' : y_pos + self.playerSprite.height} \
                      }
@@ -300,6 +325,14 @@ class Player:
                 for point in player_box.keys():
                     if self.within(player_box[point],hitbox):
                         return (point,player_box[point],hitbox)
+        for crate in level.objects:
+            if crate.playerClass == 'block':
+                for point in player_box:
+                    if self.within(player_box[point], crate.hitbox) or self.within(player_box[point],crate.hitbox):
+                        return (point, player_box[point], crate.hitbox)
+                    if self.within(player_box[point],crate.hitbox) or self.within(player_box[point],crate.hitbox) :
+                        return (point, player_box[point], crate.hitbox)
+
         return False
 
     def will_collide_v(self,config,level):
@@ -340,6 +373,7 @@ class Player:
                       'ul' : {'x' : x_pos - self.hitbox_size ,'y' : y_pos + self.playerSprite.height},\
                       'ur' : {'x' : x_pos + self.hitbox_size ,'y' : y_pos + self.playerSprite.height}
                      }
+
         if self.debugging:
             for point in player_box.values():
                 color = (0,0,0)
