@@ -3,6 +3,7 @@
 # Important Libraries
 import pyglet
 from pprint import pp
+import sys
 # Our own Game Libraries
 import sprites, config
 from player import Player
@@ -75,6 +76,7 @@ class Level:
             if not obj.draw(t,config=config,level=self,w=width,h=width):
                 print("REMOVED")
                 self.objects.remove(obj)
+        print(f'level: {sys.getsizeof(self)}')
 
         # Draw the hero.
         self.hero.draw(t,keyTracking,self.enemies,config,level)

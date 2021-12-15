@@ -77,23 +77,23 @@ goalDefinition = '''
 20
 19
 18
-17 um ur
-16 mm mr
-15 mm mr
-14 mm mr                                                                ml mm mm mm mm mm mm mr
-13 mm mr                   hl hm hm hm hm hm hm hm hm um ur                ml mm mm mr
-12 mm mr                                              ml mr
-11 mm mr           hr                                 ml mr
-10 mm mr                                              ml mr
-09 mm cr wl ur                      bt                ml mr                                                 ul ur
-08 mm mm mm mr                      bb                ml mr                                                 ml mr
-07 mm mm mm cr wl um um um um um um um ur             ml mr                                     ul um um wr cl mr
-06 mm mm mm mm mm mm mm mm mm mm mm mm cr wl um um wr cl cr wl um ur bu ul um um ur    ul um um cl mm mm mm mm mrmm mm mm mm mm mm m
-05 mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm
-04 mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm
-03 mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm
-02 mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm
-01 mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm
+17
+16
+15
+14
+13
+12
+11
+10
+09
+08
+07
+06
+05
+04
+03
+02
+01
 00 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80
 '''
 

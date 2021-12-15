@@ -5,6 +5,7 @@ import pyglet, config
 from graphics import *
 from pygame import Rect
 from pyglet.window import key
+import sys
 # Our Hero ClassW
 class Player:
     def __init__(self, sprites={},buildSprite=None,playerClass="hero",mode="Run",facing="Right",speed=0.05,scale=0.15,loop=True,x=380,y=250):
@@ -202,6 +203,7 @@ class Player:
 
     # Draw our character
     def draw(self, t, keyTracking, enemies,config,level,*other):
+
         self.playerSprite.draw()
         self.check_dead(enemies,config)
         if self.dead:

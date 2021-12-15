@@ -76,24 +76,16 @@ class Crate:
 
 
     def check_weapon_hit(self,level):
-        for point in self.hitbox.values():
-            color = (255,0,0)
-            pyglet.shapes.Circle(point['x'],point['y'], 2, color = color).draw()
-
-
         for weapon in level.objects:
             if  weapon.mode == 'Block':
                 continue
-            point = {'only' : {'x' : weapon.objSprite.x, 'y': weapon.objSprite.y}}
-            if self.within(point['only'],self.hitbox):
+            if self.within({'x' : weapon.objSprite.x, 'y': weapon.objSprite.y},self.hitbox):
                 dead = True
                 return True
         return False
 
     def check_terrain_hit(self,config):
-
         level,width,height = (config.level,config.width,config.height)
-
         player_box = {'only':{'x' : self.objSprite.x, 'y' : self.objSprite.y}}
         delta_x = 0
         delta_y = 0
