@@ -8,6 +8,7 @@ import sprites, config
 from player import Player
 from enemy import Enemy
 from spawned_item import Object
+from crate import Crate
 from pyglet.gl import glLoadIdentity, glTranslatef
 
 # SI460 Level Definition
@@ -83,7 +84,6 @@ class Level:
         dy = abs(self.hero.dy)
         relative_pos_x = self.hero.playerSprite.x + self.scrollX
         relative_pos_y = self.hero.playerSprite.y - self.scrollY
-        print(f'x:{self.hero.playerSprite.x} scrollX: {self.scrollX} relative {relative_pos_x}')
         if relative_pos_x >  .75 * width:
             self.scrollX -= dx
         if relative_pos_x < .25 * width:
@@ -100,17 +100,30 @@ class Level:
         glLoadIdentity()
         glTranslatef(self.scrollX, -self.scrollY, 0)
 
-    def add_item(self,dx,dy,type,mode,facing,x,y):
-        self.objects.append(Object(dx,dy,sprites=gameSprites,
-                                    buildSprite = sprites.buildSprite,
-                                    playerClass = type,
-                                    mode = mode,
-                                    facing = facing,
-                                    speed = .05,
-                                    scale = .15,
-                                    loop = True,
-                                    x=x,
-                                    y=y))
+    def add_item(self,dx,dy,type,mode
+    ,facing,x,y):
+        if type == 'block':
+            self.objects.append(Crate(dx,dy,sprites=gameSprites,
+                                        buildSprite = sprites.buildSprite,
+                                        playerClass = type,
+                                        mode = mode,
+                                        facing = facing,
+                                        speed = .05,
+                                        scale = .15,
+                                        loop = True,
+                                        x=x,
+                                        y=y))
+        elif type == 'weapon':
+            self.objects.append(Object(dx,dy,sprites=gameSprites,
+                                        buildSprite = sprites.buildSprite,
+                                        playerClass = type,
+                                        mode = mode,
+                                        facing = facing,
+                                        speed = .05,
+                                        scale = .15,
+                                        loop = True,
+                                        x=x,
+                                        y=y))
     def play_sound(self,filename,loop):
         self.newSound = pyglet.media.load(filename)
         self.newSound.play()

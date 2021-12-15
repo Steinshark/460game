@@ -1,4 +1,4 @@
-#!/usr/bin/python3 -B
+#!/usr/bin/python3 
 
 # This library assists in determining where the tiles will be placed on
 # the game board.

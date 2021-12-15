@@ -142,6 +142,9 @@ class Player:
                 self.attack_start = t
                 level.play_sound('mylevel/music/attack.wav',False)
                 self.changeSprite(mode="Attack")
+        if key.E in keyTracking.keys():
+            level.add_item(0,0,"block",'Block',self.facing,self.playerSprite.x,self.playerSprite.y + self.playerSprite.height/2)
+
 
 
 
