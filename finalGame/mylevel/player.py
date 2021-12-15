@@ -40,7 +40,7 @@ class Player:
         self.remain_dead = False
         self.threw = False
         self.place_block = 0.0
-
+        self.init_jump = False
         self.hitbox_size = .15*(self.sprites['hero']['Run']['Right'][0].get_image_data().width + self.sprites['hero']['Idle']['Right'][0].get_image_data().width) / 4
         # Build the starting character sprite
         self.changeSprite()
@@ -154,11 +154,8 @@ class Player:
         if key.R in keyTracking.keys():
             col = math.floor(self.playerSprite.x/config.width)
             row = math.floor(self.playerSprite.y/config.height) - 1
-            print(f'row: {row} col : {col}')
-            import pprint
-            pprint.pp(config.level)
-            input()
-            del(config.level[row][col])
+
+            del(config.level[col][row])
 
         if self.attacking:
             for enemy in level.enemies:
