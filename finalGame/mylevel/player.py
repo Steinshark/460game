@@ -32,7 +32,6 @@ class Player:
         self.dx = 0
         self.dy = 0
         self.jump_x = (3 / 2) * math.pi
-        (3 / 2) * math.pi
         self.step = .1
         self.debugging = True
         self.attacking = False
@@ -152,12 +151,6 @@ class Player:
                 self.place_block = t
                 level.add_item(0,0,"block",'Block',self.facing,self.playerSprite.x,self.playerSprite.y + self.playerSprite.height/2)
 
-        if key.R in keyTracking.keys():
-            col = math.floor(self.playerSprite.x/config.width)
-            row = math.floor(self.playerSprite.y/config.height) - 1
-
-            del(config.level[col][row])
-
         if self.attacking:
             for enemy in level.enemies:
                 distance_y = abs(self.playerSprite.y - enemy.sprite.y)
@@ -235,7 +228,8 @@ class Player:
         if ((res := self.will_collide_v(config,level)) != False) and not self.init_jump:
             if res[0] == 'upper':
                 #self.dy = res[2]['ll']['y'] - res[1]['y'] - .01
-                self.dy = (self.playerSprite.y + self.playerSprite.height - res[2]['ll']['y']) - .01
+                #self.dy = (self.playerSprite.y + self.playerSprite.height - res[2]['ll']['y']) - .01
+                self.dy = -5
                 self.jump_x = math.pi + .5
             elif res[0] == 'lower':
                 self.dy = -abs(res[2]['ul']['y'] - self.playerSprite.y) + .01

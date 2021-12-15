@@ -44,8 +44,6 @@ class Crate:
         ur = {'x' : x + width/2,            'y' : y + height}
         self.hitbox = {'ll' : ll ,'lr' : lr ,'ul' : ul ,'ur' : ur}
 
-
-
     # Build the initial character
     def changeSprite(self, mode=None, facing=None):
         if mode is not None:
@@ -65,7 +63,6 @@ class Crate:
                                              self.animationX,
                                              self.animationY)
 
-
     # Draw our character
     def draw(self, t=0, keyTracking={}, config=None,level=None,w=800,h=600,*other):
         self.objSprite.draw()
@@ -73,7 +70,6 @@ class Crate:
 
     def check_remove(self,config,w,h,level):
         return      not (time.time() - self.t_0 > 3.2 or self.check_weapon_hit(level))
-
 
     def check_weapon_hit(self,level):
         for weapon in level.objects:

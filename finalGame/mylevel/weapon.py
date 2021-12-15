@@ -73,7 +73,7 @@ class Object:
 
     def check_remove(self,config,w,h,level):
         return      self.objSprite.x+level.scrollX > w or self.objSprite.x < 0 or\
-                    self.objSprite.y > len(list(config.level.keys()))*config.height or self.objSprite.y < 0 or\
+                    self.objSprite.y-level.scrollY > w or self.objSprite.y < 0 or\
                     time.time() - self.t_0 > 10 or\
                     self.check_terrain_hit(config) or\
                     self.check_enemy_hit(level)

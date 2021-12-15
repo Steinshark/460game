@@ -28,26 +28,26 @@ levelDefinition = '''
 28
 27
 26
-25                                                                          hl hm hm hm hm um um um um um um um mm mr
-24                                                                                         hl mm mm mm mm mm mm mr
-23                                                                                         hl mm mm mm mr
+25                                                                         hl hm hm hm hm um um um um um um um mm mr
+24                                                                                        hl mm mm mm mm mm mm mr
+23                                                                                        hl mm mm mm mr
 22
 21
 20
-19
-18
-17 um ur
-16 mm mr                               hl hr                                     um um um um um um um ur
-15 mm mr                                                             hl um um um mm mm mm mm mm mm mr
-14 mm mr                                                                ml mm mm mm mm mm mm mr
+19                                                                                                                   rl um um um um um ur
+18                                                                                                                                                                         ul um um mm
+17 um ur                                                                                                                                                                   ml mm mm mm
+16 mm mr                               hl hr                                     um um um um um um um ur                                                                   ml mm mm mm
+15 mm mr                                                             hl um um um mm mm mm mm mm mm mr                                                                      ml mm mm mm
+14 mm mr                                                                ml mm mm mm mm mm mm mr                                                                   hl um um cl mm mm
 13 mm mr                   hl hm hm hm hm hm hm hm hm um ur                ml mm mm mr
 12 mm mr                                              ml mr
-11 mm mr           hr                                 ml mr
+11 mm mr          hr                                  ml mr
 10 mm mr                                              ml mr
 09 mm cr wl ur                      bt                ml mr                                                 ul ur
 08 mm mm mm mr                      bb                ml mr                                                 ml mr
 07 mm mm mm cr wl um um um um um um um ur             ml mr                                     ul um um wr cl mr
-06 mm mm mm mm mm mm mm mm mm mm mm mm cr wl um um wr cl cr wl um ur bu ul um          ul um um cl mm mm mm mm mr mm mm mm mm mm mm m
+06 mm mm mm mm mm mm mm mm mm mm mm mm cr wl um um wr cl cr wl um ur bu ul um          ul um um cl mm mm mm mm mr mm mm mm mm mm mm mm
 05 mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm um       mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm
 04 mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm          mm mm mm mm mm mm       mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm
 03 mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm                               mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm mm
