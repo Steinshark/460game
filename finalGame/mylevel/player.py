@@ -207,7 +207,8 @@ class Player:
                 self.changeSprite(mode= 'Dead',facing = self.facing,loop = False)
                 level.play_sound('mylevel/music/hero_death.wav',False)
                 self.remain_dead = True
-
+        elif self.check_win(config):
+            print("WON")
 
         else:
             self.movement(config, t, keyTracking,level)
@@ -394,5 +395,32 @@ class Player:
                 if self.within(player_box[point],hitbox):
                     self.dead = True
                     return True
+
+        return False
+
+    def check_win(self,config):
+        x_pos = self.playerSprite.x
+        y_pos = self.playerSprite.y
+        player_box = {'ll' : {'x' : x_pos - self.hitbox_size*.8 ,'y' : y_pos},\
+                      'lr' : {'x' : x_pos + self.hitbox_size*.8 ,'y' : y_pos},\
+                      'ul' : {'x' : x_pos - self.hitbox_size*.8 ,'y' : y_pos + self.playerSprite.height*.85},\
+                      'ur' : {'x' : x_pos + self.hitbox_size*.8 ,'y' : y_pos + self.playerSprite.height*.85}
+                     }
+        for y in config.goals:
+            for x in config.goals[y]:
+                width = config.goals[y][x].width * self.animationScale
+                height = config.goals[y][x].height * self.animationScale
+                print(width)
+                box = {
+                             'll' : {'x' : x * config.width            ,'y' : y * config.height},                           \
+                             'lr' : {'x' : x * config.width + width    ,'y' : y * config.height},                           \
+
+                             'ul' : {'x' : x * config.width            ,'y' : y * config.height + height},\
+                             'ur' : {'x' : x * config.width + width    ,'y' : y * config.height + height}
+                            }
+                print(f'{box["ll"]} : {box["lr"]} : {box["ul"]} : {box["ur"]}')
+                for point in box.keys():
+                    if self.within(player_box[point],box):
+                        return True
 
         return False

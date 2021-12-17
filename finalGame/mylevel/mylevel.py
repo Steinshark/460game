@@ -37,10 +37,24 @@ class Level:
         # start playing the music
         self.player.loop = True
         self.player.play()
+
+        #scrolling items
         self.delta_x = 0
         self.delta_y = 0
         self.scrollX = 0
         self.scrollY = 0
+
+        #Dimensionality
+        self.level_height = len(config.level.keys()) * config.height
+        print(self.level_height)
+        self.level_width = len(list(config.level.values())[0]) * config.width
+        print(self.level_width)
+
+
+
+        # Score handling
+        self.points = 0
+        self.score = pyglet.text.Label('HELLO WORLD',font_name='Times New Roman', font_size = 24, x = 50, y = 20-self.scrollY, anchor_x = 'left',anchor_y = 'top')
 
     # Here is a complete drawBoard function which will draw the terrain.
     # Lab Part 1 - Draw the board here
@@ -59,15 +73,12 @@ class Level:
 
 
     def draw(self, t=0, width=800, height=600, keyTracking={}, mouseTracking=[], *other):
-
-        # Draw the game background
-        if self.background.width < width:
-            self.background.blit(self.background_x,self.background_y,height=height,width=width)
-        else:
-            self.background.blit(self.background_x,self.background_y,height=height)
-
+        self.background.blit(self.background_x,self.background_y,height=max((config.rows+4)*config.height, height),width=max((config.cols+1)*config.width, width))
+        self.score = pyglet.text.Label(str(self.points).zfill(5),font_name='Times New Roman', font_size = 24, x = 50 - self.scrollX, y = (height+self.scrollY)-100, anchor_x = 'left',anchor_y = 'top')
+        print(config.goals)
         # Draw the gameboard
-        self.drawBoard(config.level, 0, 0, config.height, config.width)
+        self.drawBoard(config.level, self.background_x, self.background_y, config.height, config.width)
+        self.drawBoard(config.goals, self.background_x, self.background_y, config.height, config.width)
         # Draw the enemies
         for enemy in self.enemies:
             enemy.draw(t,config=config,level=self)
@@ -76,7 +87,6 @@ class Level:
             if not obj.draw(t,config=config,level=self,w=width,h=width):
                 print("REMOVED")
                 self.objects.remove(obj)
-        print(f'level: {sys.getsizeof(self)}')
 
         # Draw the hero.
         self.hero.draw(t,keyTracking,self.enemies,config,level)
@@ -95,10 +105,12 @@ class Level:
         if relative_pos_y < .15 * height:
             self.scrollY -= dy
 
-        self.background_x = -.9 * self.scrollX
-        self.background_y =   1 * self.scrollY
+        #self.background_x = -.9 * self.scrollX
+        #self.background_y =   1 * self.scrollY
 
         # Shift the world
+        self.score.draw()
+
         glLoadIdentity()
         glTranslatef(self.scrollX, -self.scrollY, 0)
 

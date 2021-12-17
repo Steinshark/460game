@@ -29,11 +29,8 @@ class Object:
         self.dx = dx
         self.dy = dy
 
-
         # Build the starting character sprite
         self.changeSprite()
-
-
 
     # Build the initial character
     def changeSprite(self, mode=None, facing=None):
@@ -58,7 +55,6 @@ class Object:
         self.objSprite.x += self.dx
         self.objSprite.y += self.dy
         pass
-
 
 
     # Draw our character
