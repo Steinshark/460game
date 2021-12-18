@@ -417,6 +417,7 @@ class Player:
     def set_invincible(self):
         self.set_invincible_time = time.time()
         self.invincible= True
+        
     def check_win(self,config):
         for y in config.goals:
             for x in config.goals[y]:
