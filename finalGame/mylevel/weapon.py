@@ -75,9 +75,8 @@ class Object:
                     self.check_enemy_hit(level)
 
     def check_enemy_hit(self,level):
-        item_hitbox = {'point':{'x' : self.sprite.x, 'y' : self.sprite.y}}
         for enemy in level.enemies:
-            if enemy.will_this_kill_me(item_hitbox) and not enemy.dead:
+            if enemy.will_this_kill_me(self.hitbox) and not enemy.dead:
                 level.score += 100
                 level.hero.kills += 1
                 enemy.dead = True

@@ -73,7 +73,7 @@ class Crate:
             pyglet.shapes.Circle(point['x'],point['y'], 2, color = color).draw()
 
         for weapon in level.objects:
-            if  weapon.mode in ['Block','star']:
+            if  weapon.mode in ['Block','star', 'key']:
                 continue
             if self.within(weapon.hitbox['only'],self.hitbox):
                 dead = True

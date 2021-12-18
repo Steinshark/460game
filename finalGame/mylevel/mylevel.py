@@ -11,6 +11,7 @@ from enemy import Enemy
 from weapon import Object
 from star import Star
 from crate import Crate
+from key import Key
 import time
 from pyglet.gl import glLoadIdentity, glTranslatef
 
@@ -50,10 +51,12 @@ class Level:
         self.level_height = len(config.level.keys()) * config.height
         self.checkpoint = 0
         self.level_width = len(list(config.level.values())[0]) * config.width
-        self.region_unlocks = {1 : [(22,1), (22,2)]}
-        self.region_objective = {0: "Objective: Kill 5 Zombies", 1: "Objective: Find the key"}
+        self.region_unlocks = {1 : [(22,1), (22,2)], 2: [(61,3), (61,4)]}
+        self.region_objective = {0: "Objective: Kill 5 Zombies", 1: "Objective: Find the key", 2: "Objective: Finish Level"}
+        self.level_won = False
         # items
         self.star = star
+        self.key = key
         # Score handling
         self.score = 0
         height = 0
@@ -87,6 +90,8 @@ class Level:
         self.drawBoard(config.goals, self.background_x, self.background_y, config.height, config.width)
         if self.star.spawned:
             self.star.draw(t,config=config,level=self)
+        if self.key.spawned:
+            self.key.draw(t,config=config,level=self)
         # Draw the enemies
         for enemy in self.enemies:
             enemy.draw(t,config=config,level=self)
@@ -118,10 +123,14 @@ class Level:
         #self.background_y =   1 * self.scrollY
 
         # Shift the world
+        if self.level_won:
+            pyglet.text.Label('YOU WIN',font_name='Times New Roman',font_size = 50, x = 350 - self.scrollX, y = (height+self.scrollY)-300 , anchor_x = 'center',anchor_y = 'top').draw()
+
         self.score_label.draw()
         self.objective_label.draw()
         if self.hero.invincible:
             self.invulnerable_label.draw()
+
         glLoadIdentity()
         glTranslatef(self.scrollX, -self.scrollY, 0)
         self.check_checkpoint(config)
@@ -160,7 +169,9 @@ class Level:
                 self.checkpoint = 1
                 self.unlock_region(1,config)
         elif self.checkpoint == 1:
-            pass
+            if not self.key.spawned:
+                self. checkpoint = 2
+                self.unlock_region(2,config)
     def unlock_region(self,region,config):
             for unlock_block in self.region_unlocks[region]:
                 col,row = unlock_block
@@ -193,7 +204,7 @@ enemies = [Enemy(   gameSprites,\
                     enemy[0] * config.width ,\
                     enemy[1] * config.height+ 1) for enemy in config.enemies]
 star = Star(gameSprites,sprites.buildSprite,.01,.15,850,150)
-
+key  = Key( gameSprites,sprites.buildSprite,.01,.15,50,1300)
 
 # provide the level to the game engine
 print('Starting level:', config.levelName)

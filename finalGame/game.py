@@ -71,7 +71,6 @@ class Game:
             # Lets draw all of the individual objects, these objects
             # need to have a draw function that takes in worldTime as
             # a variable.
-            print(f'game: {sys.getsizeof(self)}')
 
 
             if self.level is not None:

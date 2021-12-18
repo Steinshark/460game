@@ -32,7 +32,7 @@ class Player:
         self.dy = 0
         self.jump_x = (3 / 2) * math.pi
         self.step = .1
-        self.debugging = True
+        self.debugging = False
         self.attacking = False
         self.attack_start = 0
         self.dead = False
@@ -154,7 +154,6 @@ class Player:
         #       attacking sequence
         if key.LALT in keyTracking.keys():
             if not self.attacking:
-                print("INIT ATTACK")
                 self.attacking = True
                 update = False
 
@@ -175,13 +174,11 @@ class Player:
                 distance_y = abs(self.sprite.y - enemy.sprite.y)
                 if self.facing == 'Right':
                     distance_x = abs(self.hitbox['lr']['x'] - enemy.hitbox['ll']['x'])
-                    print(f'{distance_x}')
                     if distance_x < 50 and distance_y < 100:
                         enemy.dead = True
                         enemy.died_at = time.time()
                         self.kills += 1
                         level.score += 200
-                        print("adding 200")
                         self.attacking = False
                 elif self.facing == 'Left':
                     distance_x = abs(self.hitbox['ll']['x'] - enemy.hitbox['lr']['x'])
@@ -190,7 +187,6 @@ class Player:
                         enemy.died_at = time.time()
                         self.kills += 1
                         level.score += 200
-                        print("adding 200")
                         self.attacking = False
             if t - self.attack_start > .41:
                 self.attacking = False
@@ -238,7 +234,8 @@ class Player:
                 self.changeSprite(mode= 'Dead',facing = self.facing,loop = False)
                 level.play_sound('mylevel/music/hero_death.wav',False)
                 self.remain_dead = True
-        elif self.check_win(config):
+        elif self.check_win(config,):
+            level.level_won = True
             print("WON")
 
         else:
@@ -417,13 +414,12 @@ class Player:
     def set_invincible(self):
         self.set_invincible_time = time.time()
         self.invincible= True
-        
+
     def check_win(self,config):
         for y in config.goals:
             for x in config.goals[y]:
                 width = config.goals[y][x].width * self.animationScale
                 height = config.goals[y][x].height * self.animationScale
-                print(width)
                 box = {
                              'll' : {'x' : x * config.width            ,'y' : y * config.height},                           \
                              'lr' : {'x' : x * config.width + width    ,'y' : y * config.height},                           \
@@ -431,7 +427,6 @@ class Player:
                              'ul' : {'x' : x * config.width            ,'y' : y * config.height + height},\
                              'ur' : {'x' : x * config.width + width    ,'y' : y * config.height + height}
                             }
-                print(f'{box["ll"]} : {box["lr"]} : {box["ul"]} : {box["ur"]}')
                 for point in box.keys():
                     if self.within(self.hitbox[point],box):
                         return True

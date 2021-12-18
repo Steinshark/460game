@@ -94,11 +94,11 @@ class Enemy:
         pass
 
 
-    # Draw our character
+    # Draw our enemy
     def draw(self, t=0, keyTracking={}, config=None,level=None,*other):
-        self.update_hitbox()
         if not self.dead:
             self.movement(config, t, keyTracking)
+            self.update_hitbox()
         else:
             if not self.remain_dead:
                 level.play_sound('mylevel/music/enemy_death.wav',False)
