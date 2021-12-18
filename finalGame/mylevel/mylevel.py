@@ -9,12 +9,14 @@ import sprites, config
 from player import Player
 from enemy import Enemy
 from weapon import Object
+from star import Star
 from crate import Crate
+import time
 from pyglet.gl import glLoadIdentity, glTranslatef
 
 # SI460 Level Definition
 class Level:
-    def __init__(self, sprites, hero, enemies=[]):
+    def __init__(self, sprites, hero, star, enemies=[]):
 
         # Create the Background, this is one method of creating images,
         # we will work with multiple methods.
@@ -46,16 +48,18 @@ class Level:
 
         #Dimensionality
         self.level_height = len(config.level.keys()) * config.height
-        print(self.level_height)
+        self.checkpoint = 0
         self.level_width = len(list(config.level.values())[0]) * config.width
-        print(self.level_width)
-
-
-
+        self.region_unlocks = {1 : [(22,1), (22,2)]}
+        self.region_objective = {0: "Objective: Kill 5 Zombies", 1: "Objective: Find the key"}
+        # items
+        self.star = star
         # Score handling
-        self.points = 0
-        self.score = pyglet.text.Label('HELLO WORLD',font_name='Times New Roman', font_size = 24, x = 50, y = 20-self.scrollY, anchor_x = 'left',anchor_y = 'top')
-
+        self.score = 0
+        height = 0
+        self.score_label        = pyglet.text.Label('HELLO WORLD',font_name='Times New Roman',                          font_size = 20, x = 50 - self.scrollX, y = (height+self.scrollY)-40 , anchor_x = 'left',anchor_y = 'top')
+        self.objective_label    = pyglet.text.Label(self.region_objective[self.checkpoint],font_name='Times New Roman', font_size = 20, x = 50 - self.scrollX, y = (height+self.scrollY)-70 , anchor_x = 'left',anchor_y = 'top')
+        self.invulnerable_label = pyglet.text.Label('Invulnerable!',font_name='Times New Roman',                        font_size = 20, x = 50 - self.scrollX, y = (height+self.scrollY)-100, anchor_x = 'left',anchor_y = 'top')
     # Here is a complete drawBoard function which will draw the terrain.
     # Lab Part 1 - Draw the board here
     def drawBoard(self, level, delta_x=0, delta_y=0, height=50, width=50):
@@ -74,18 +78,23 @@ class Level:
 
     def draw(self, t=0, width=800, height=600, keyTracking={}, mouseTracking=[], *other):
         self.background.blit(self.background_x,self.background_y,height=max((config.rows+4)*config.height, height),width=max((config.cols+1)*config.width, width))
-        self.score = pyglet.text.Label(str(self.points).zfill(5),font_name='Times New Roman', font_size = 24, x = 50 - self.scrollX, y = (height+self.scrollY)-100, anchor_x = 'left',anchor_y = 'top')
-        print(config.goals)
+        self.score_label = pyglet.text.Label('Score: ' + str(self.score).zfill(5),      font_name='Times New Roman', font_size = 20, x = 50 - self.scrollX, y = (height+self.scrollY)-40, anchor_x = 'left',anchor_y = 'top')
+        self.objective_label = pyglet.text.Label(self.region_objective[self.checkpoint],font_name='Times New Roman', font_size = 20, x = 50 - self.scrollX, y = (height+self.scrollY)-70, anchor_x = 'left',anchor_y = 'top')
+        self.invulnerable_label = pyglet.text.Label('Invulnerable!',font_name='Times New Roman',                        font_size = 20, x = 50 - self.scrollX, y = (height+self.scrollY)-100, anchor_x = 'left',anchor_y = 'top')
+
         # Draw the gameboard
         self.drawBoard(config.level, self.background_x, self.background_y, config.height, config.width)
         self.drawBoard(config.goals, self.background_x, self.background_y, config.height, config.width)
+        if self.star.spawned:
+            self.star.draw(t,config=config,level=self)
         # Draw the enemies
         for enemy in self.enemies:
             enemy.draw(t,config=config,level=self)
+            if enemy.remove:
+                self.enemies.remove(enemy)
 
         for obj in self.objects:
             if not obj.draw(t,config=config,level=self,w=width,h=width):
-                print("REMOVED")
                 self.objects.remove(obj)
 
         # Draw the hero.
@@ -94,8 +103,8 @@ class Level:
         # Calculate the scrolling
         dx = abs(self.hero.dx)
         dy = abs(self.hero.dy)
-        relative_pos_x = self.hero.playerSprite.x + self.scrollX
-        relative_pos_y = self.hero.playerSprite.y - self.scrollY
+        relative_pos_x = self.hero.sprite.x + self.scrollX
+        relative_pos_y = self.hero.sprite.y - self.scrollY
         if relative_pos_x >  .75 * width:
             self.scrollX -= dx
         if relative_pos_x < .25 * width:
@@ -109,10 +118,13 @@ class Level:
         #self.background_y =   1 * self.scrollY
 
         # Shift the world
-        self.score.draw()
-
+        self.score_label.draw()
+        self.objective_label.draw()
+        if self.hero.invincible:
+            self.invulnerable_label.draw()
         glLoadIdentity()
         glTranslatef(self.scrollX, -self.scrollY, 0)
+        self.check_checkpoint(config)
 
     def add_item(self,dx,dy,type,mode,facing,x,y):
         if type == 'block':
@@ -134,13 +146,26 @@ class Level:
                                         facing = facing,
                                         speed = .05,
                                         scale = .15,
-                                        loop = True,
+                                        loop = False,
                                         x=x,
                                         y=y))
     def play_sound(self,filename,loop):
         self.newSound = pyglet.media.load(filename)
         self.newSound.play()
         return
+
+    def check_checkpoint(self,config):
+        if self.checkpoint == 0:
+            if self.hero.kills >= 5:
+                self.checkpoint = 1
+                self.unlock_region(1,config)
+        elif self.checkpoint == 1:
+            pass
+    def unlock_region(self,region,config):
+            for unlock_block in self.region_unlocks[region]:
+                col,row = unlock_block
+                del config.level[row][col]
+
 
 # Load all game sprites
 print('Loading Sprites...')
@@ -167,9 +192,9 @@ enemies = [Enemy(   gameSprites,\
                     True,
                     enemy[0] * config.width ,\
                     enemy[1] * config.height+ 1) for enemy in config.enemies]
-
+star = Star(gameSprites,sprites.buildSprite,.01,.15,850,150)
 
 
 # provide the level to the game engine
 print('Starting level:', config.levelName)
-level = Level(gameSprites, hero, enemies)
+level = Level(gameSprites, hero, star, enemies,)

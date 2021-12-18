@@ -1,18 +1,16 @@
 #!/usr/bin/python3
 
 # Important Libraries
-import pyglet, config
-from graphics import *
-from pygame import Rect
+import pyglet, config, math
 import time
 # An Enemy Combatant
 class Crate:
     def __init__(self,dx,dy, sprites={},buildSprite=None,playerClass="enemy-1",mode="Run",facing="Right",speed=0.05,scale=0.15,loop=True,x=380,y=250):
 
         # Store the sprites, and the sprite building function
-        self.objSprites      = sprites
-        self.buildSprite  = buildSprite
-        self.objSprite = None
+        self.sprites        = sprites
+        self.buildSprite    = buildSprite
+        self.sprite         = None
         # Some basic settings
         self.animationSpeed = speed
         self.animationScale = 1.3
@@ -26,23 +24,21 @@ class Crate:
         self.facing         = facing
 
         self.t_0   = time.time()
-        self.dx = dx
-        self.dy = dy
+
 
 
 
         # Build the starting character sprite
         self.changeSprite()
+        self.hitbox = {'only':{'x' : self.sprite.x, 'y' : self.sprite.y}}
 
 
-        x,y = self.objSprite.x, self.objSprite.y
-        width,height = self.objSprite.width, self.objSprite.height
-        item_hitbox = {}
-        ll = {'x' : x - width/2,            'y' : y}
-        lr = {'x' : x + width/2,            'y' : y}
-        ul = {'x' : x - width/2,            'y' : y + height}
-        ur = {'x' : x + width/2,            'y' : y + height}
-        self.hitbox = {'ll' : ll ,'lr' : lr ,'ul' : ul ,'ur' : ur}
+        x,y = self.sprite.x, self.sprite.y
+        width,height = self.sprite.width, self.sprite.height
+        self.hitbox = { 'll' : {'x' : x - width/2,            'y' : y} ,
+                        'lr' : {'x' : x + width/2,            'y' : y} ,
+                        'ul' : {'x' : x - width/2,            'y' : y + height},
+                        'ur' : {'x' : x + width/2,            'y' : y + height}}
 
     # Build the initial character
     def changeSprite(self, mode=None, facing=None):
@@ -50,10 +46,10 @@ class Crate:
             self.mode = mode
         if facing is not None:
             self.facing = facing
-        if self.objSprite is not None:
-            self.animationX = self.objSprite.x
-            self.animationY = self.objSprite.y
-        self.objSprite = self.buildSprite(self.objSprites,
+        if self.sprite is not None:
+            self.animationX = self.sprite.x
+            self.animationY = self.sprite.y
+        self.sprite = self.buildSprite(self.sprites,
                                              self.playerClass,
                                              self.mode,
                                              self.facing,
@@ -65,26 +61,28 @@ class Crate:
 
     # Draw our character
     def draw(self, t=0, keyTracking={}, config=None,level=None,w=800,h=600,*other):
-        self.objSprite.draw()
+        self.sprite.draw()
         return self.check_remove(config,w,h,level)
 
     def check_remove(self,config,w,h,level):
         return      not (time.time() - self.t_0 > 3.2 or self.check_weapon_hit(level))
 
     def check_weapon_hit(self,level):
+        for point in self.hitbox.values():
+            color = (0,0,0)
+            pyglet.shapes.Circle(point['x'],point['y'], 2, color = color).draw()
+
         for weapon in level.objects:
-            if  weapon.mode == 'Block':
+            if  weapon.mode in ['Block','star']:
                 continue
-            if self.within({'x' : weapon.objSprite.x, 'y': weapon.objSprite.y},self.hitbox):
+            if self.within(weapon.hitbox['only'],self.hitbox):
                 dead = True
                 return True
         return False
 
     def check_terrain_hit(self,config):
         level,width,height = (config.level,config.width,config.height)
-        player_box = {'only':{'x' : self.objSprite.x, 'y' : self.objSprite.y}}
-        delta_x = 0
-        delta_y = 0
+
         # Terrain collision parametrics
         for row in level.keys():
             for col in level[row]:
@@ -95,8 +93,8 @@ class Crate:
                 ur = {'x' : x + width,  'y' : y + height}
                 hitbox = {'ll' : ll ,'lr' : lr ,'ul' : ul ,'ur' : ur}
 
-                for point in player_box.keys():
-                    if self.within(player_box[point],hitbox):
+                for point in self.hitbox.keys():
+                    if self.within(self.hitbox[point],hitbox):
                         return True
 
         return False

@@ -1,9 +1,7 @@
 #!/usr/bin/python3
 
 # Important Libraries
-import pyglet, config
-from graphics import *
-from pygame import Rect
+import pyglet, config, math, time
 # An Enemy Combatant
 class Enemy:
     def __init__(self, sprites={},buildSprite=None,playerClass="enemy-1",mode="Run",facing="Right",speed=0.05,scale=0.15,loop=True,x=380,y=250):
@@ -35,7 +33,16 @@ class Enemy:
         self.dx = random.uniform(.5,1) * 2.5
         self.dy = 0
         # Build the starting character sprite
+        self.hitbox_size = .15*(self.sprites['hero']['Run']['Right'][0].get_image_data().width + self.sprites['hero']['Idle']['Right'][0].get_image_data().width) / 4
+        self.died_at = 0.0
+        self.remove = False
         self.changeSprite()
+
+        self.hitbox = {'ll' : {'x' :x - self.hitbox_size ,'y' : y},\
+                       'lr' : {'x' : x + self.hitbox_size ,'y' : y},\
+                       'ul' : {'x' : x - self.hitbox_size ,'y' : y + self.sprite.height},\
+                       'ur' : {'x' : x + self.hitbox_size ,'y' : y + self.sprite.height}
+                     }
 
 
 
@@ -45,7 +52,6 @@ class Enemy:
 
         # Dont bother changing the Sprite if nothing has changed
         if mode != self.mode or facing != self.facing or self.sprite is None:
-            print(mode)
             # Should we change the default loop status (example death)
             if loop is not None:
                 self.animationLoop = loop
@@ -90,6 +96,7 @@ class Enemy:
 
     # Draw our character
     def draw(self, t=0, keyTracking={}, config=None,level=None,*other):
+        self.update_hitbox()
         if not self.dead:
             self.movement(config, t, keyTracking)
         else:
@@ -97,9 +104,9 @@ class Enemy:
                 level.play_sound('mylevel/music/enemy_death.wav',False)
                 self.changeSprite(mode='Dead',facing = self.facing,loop=False)
                 self.remain_dead = True
-
             else:
-                pass
+                if time.time() - self.died_at > 3:
+                    self.remove = True
         self.sprite.draw()
 
     def update_position_airborne(self):
@@ -112,17 +119,14 @@ class Enemy:
         self.dy = 17*math.sin(self.jump_x)
 
         if ((res := self.will_collide_v(config)) != False) and not self.init_jump:
-            print("COllision detected")
             if res[0] == 'upper':
                 self.dy = res[2]['ll']['y'] - res[1]['y'] - .01
                 self.jump_x = math.pi + .5
             else:
                 self.dy = res[2]['ul']['y'] - res[1]['y'] - .01
                 self.jump_x = (3/2) * math.pi
-                print("off")
                 self.airborne = False
-
-
+        self.update_hitbox()
 
     def check_collision_vert(self,config):
         level,width,height = (config.level,config.width,config.height)
@@ -212,22 +216,21 @@ class Enemy:
         self.sprite.x -= self.dx
 
         return collision
+
     def will_this_kill_me(self,hitbox):
-        delta_x = 0
-        delta_y = 0
-        x_pos = self.sprite.x + delta_x
-        y_pos = self.sprite.y + delta_y
-
-        player_box = {'ll' : {'x' : x_pos - self.sprite.width / 2 ,'y' : y_pos},\
-                      'lr' : {'x' : x_pos + self.sprite.width / 2 ,'y' : y_pos},\
-                      'ul' : {'x' : x_pos - self.sprite.width / 2 ,'y' : y_pos + self.sprite.height},\
-                      'ur' : {'x' : x_pos + self.sprite.width / 2 ,'y' : y_pos + self.sprite.height}
-                     }
-
         for point in hitbox:
-            if self.within(hitbox[point],player_box):
+            if self.within(hitbox[point],self.hitbox):
+                self.died_at = time.time()
                 return True
 
+    def update_hitbox(self):
+        x = self.sprite.x
+        y = self.sprite.y
+        self.hitbox = {'ll' : {'x' : x - self.hitbox_size ,'y' : y},\
+                       'lr' : {'x' : x + self.hitbox_size ,'y' : y},\
+                       'ul' : {'x' : x - self.hitbox_size ,'y' : y + self.sprite.height},\
+                       'ur' : {'x' : x + self.hitbox_size ,'y' : y + self.sprite.height}
+                     }
 
     def within(self,p1,hitbox):
         return \
